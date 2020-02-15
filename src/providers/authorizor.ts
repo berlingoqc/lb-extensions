@@ -22,15 +22,16 @@ export class RoleAuthorizationProvider implements Provider<Authorizer> {
     authorizationCtx: AuthorizationContext,
     metadata: AuthorizationMetadata,
   ) {
-    const roles = metadata.allowedRoles ?? [];
-    const userRole = authorizationCtx.principals[0].role;
+    const roles: string[] = metadata.allowedRoles ?? [];
+    const userRoles: string[] = authorizationCtx.principals[0].roles;
     let allow = false;
-    if (userRole === 'ADMIN') {
-      allow = true;
-    } else {
-      allow = userRole.role === roles[0];
-    }
-
+    console.log('ALLOWED ROLES', roles);
+    console.log('USER ROLES', userRoles);
+    roles.forEach(x => {
+      if (userRoles.indexOf(x) > -1) {
+        allow = true;
+      }
+    });
     if (allow) return AuthorizationDecision.ALLOW;
     else if (allow === false) return AuthorizationDecision.DENY;
     return AuthorizationDecision.ABSTAIN;
