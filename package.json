@@ -1,6 +1,6 @@
 {
   "name": "alb-loopback-auth",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Extension to bind application to the alborea auth microservice",
   "keywords": [
     "loopback-extension",
