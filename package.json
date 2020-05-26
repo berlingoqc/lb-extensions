@@ -42,26 +42,26 @@
   "dependencies": {
     "@loopback/authentication": "^3.3.3",
     "@loopback/authorization": "^0.4.10",
-    "@loopback/boot": "^1.6.0",
-    "@loopback/context": "^1.25.0",
-    "@loopback/core": "^1.12.0",
-    "@loopback/rest": "^1.25.0",
+    "@loopback/boot": "^1.7.4",
+    "@loopback/context": "^2.1.1",
+    "@loopback/core": "^1.12.4",
+    "@loopback/rest": "^2.0.0",
     "@types/request-promise-native": "^1.0.17",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"
   },
   "devDependencies": {
-    "@loopback/build": "^3.0.0",
+    "@loopback/build": "^3.1.1",
     "source-map-support": "^0.5.16",
-    "@loopback/testlab": "^1.10.0",
-    "@types/node": "^10.17.6",
-    "@typescript-eslint/parser": "^2.10.0",
-    "@typescript-eslint/eslint-plugin": "^2.10.0",
-    "@loopback/eslint-config": "^5.0.0",
-    "eslint": "^6.7.2",
-    "eslint-config-prettier": "^6.7.0",
-    "eslint-plugin-eslint-plugin": "^2.1.0",
+    "@loopback/testlab": "^1.10.3",
+    "@types/node": "^10.17.14",
+    "@typescript-eslint/parser": "^2.19.0",
+    "@typescript-eslint/eslint-plugin": "^2.19.0",
+    "@loopback/eslint-config": "^5.0.3",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.10.0",
+    "eslint-plugin-eslint-plugin": "^2.2.1",
     "eslint-plugin-mocha": "^6.2.2",
-    "typescript": "~3.7.3"
+    "typescript": "~3.7.5"
   }
 }
