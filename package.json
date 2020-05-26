@@ -1,11 +1,15 @@
 {
-  "name": "@alborea/loopback",
+  "name": "@alborea/loopback-sso-connector",
   "version": "1.0.4",
   "description": "Extension to bind application to the alborea auth microservice",
   "keywords": [
     "loopback-extension",
     "loopback"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alborea/alb-loopback-auth/"
+  },
   "main": "index.js",
   "engines": {
     "node": ">=8.9"
@@ -25,9 +29,6 @@
     "test": "lb-mocha --allow-console-logs \"dist/__tests__\"",
     "posttest": "npm run lint",
     "test:dev": "lb-mocha --allow-console-logs dist/__tests__/**/*.js && npm run posttest"
-  },
-  "repository": {
-    "type": "git"
   },
   "author": "",
   "license": "",
