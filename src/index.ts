@@ -1,6 +1,7 @@
 export * from './component';
 export * from './sequence';
 export * from './utils';
+export * from './services';
 export * from './strategies';
 export * from './providers';
 export * from './sequence';
