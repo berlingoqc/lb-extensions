@@ -1,7 +1,12 @@
-import {Component, ProviderMap} from '@loopback/core';
+import { Component, ProviderMap, createServiceBinding } from '@loopback/core';
+import { SSORequestService } from './services';
 
 export class AlbLoopbackAuthComponent implements Component {
-  constructor() {}
+  constructor() { }
+
+  bindings = [
+    createServiceBinding(SSORequestService)
+  ]
 
   providers?: ProviderMap = {
   };

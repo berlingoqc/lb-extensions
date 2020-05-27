@@ -1,6 +1,6 @@
 {
   "name": "@alborea/loopback-sso-connector",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Extension to bind application to the alborea auth microservice",
   "keywords": [
     "loopback-extension",
