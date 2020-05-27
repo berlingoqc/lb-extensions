@@ -1,11 +1,11 @@
+import { AuthenticationStrategy } from '@loopback/authentication';
 import { inject } from '@loopback/context';
 import { HttpErrors, Request } from '@loopback/rest';
-import { AuthenticationStrategy, TokenService } from '@loopback/authentication';
 import { UserProfile } from '@loopback/security';
-
-
 import * as rp from 'request-promise-native';
 import { AlbLoopbackAuthBindings } from '../key';
+
+
 
 export class JWTRemoteStrategy implements AuthenticationStrategy {
   name = 'jwt';
