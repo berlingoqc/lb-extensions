@@ -26,7 +26,7 @@ export class SSORequestService {
     return this.requestGet<UserProfile>(request, '/api/users/me');
   }
 
-  extractCredentials(request: Request): string {
+  extractCredentials(request: any): string {
     if (!request.headers.authorization) {
       throw new HttpErrors.Unauthorized(`Authorization header not found.`);
     }

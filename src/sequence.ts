@@ -16,6 +16,9 @@ import {
   AUTHENTICATION_STRATEGY_NOT_FOUND,
   USER_PROFILE_NOT_FOUND,
 } from '@loopback/authentication';
+import { AlbLoopbackAuthBindings } from './key';
+import { SequenceActionFn } from './providers/sequence';
+import { UserProfile } from '@loopback/security';
 
 const SequenceActions = RestBindings.SequenceActions;
 export class AuthenticationSequence implements SequenceHandler {
@@ -32,6 +35,8 @@ export class AuthenticationSequence implements SequenceHandler {
     @inject(SequenceActions.REJECT) protected reject: Reject,
     @inject(AuthenticationBindings.AUTH_ACTION)
     protected authenticateRequest: AuthenticateFn,
+    @inject(AlbLoopbackAuthBindings.SEQUENCE_PROVIDER)
+    protected sequenceFn: SequenceActionFn
   ) { }
 
   async handle(context: RequestContext) {
@@ -42,9 +47,13 @@ export class AuthenticationSequence implements SequenceHandler {
       const route = this.findRoute(request);
       //call authentication action
       await this.authenticateRequest(request);
+
       // Authentication successful, proceed to invoke controller
       const args = await this.parseParams(request, route);
+
+      await this.sequenceFn(request, args, context);
       const result = await this.invoke(route, args);
+
       this.send(response, result);
     } catch (error) {
       if (
