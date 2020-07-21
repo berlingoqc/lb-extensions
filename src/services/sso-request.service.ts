@@ -1,14 +1,14 @@
 import { bind, /* inject, */ BindingScope, inject } from '@loopback/core';
-import { AlbLoopbackAuthBindings } from '../key';
 import { Request, HttpErrors } from '@loopback/rest';
 import { UserProfile } from '@loopback/security';
 
 import * as rp from 'request-promise-native';
+import { SSOAuthBindings } from '../key';
 
 @bind({ scope: BindingScope.TRANSIENT })
 export class SSORequestService {
   constructor(
-    @inject(AlbLoopbackAuthBindings.SSO_URL)
+    @inject(SSOAuthBindings.SSO_URL)
     private readonly apiAuthURL: string
   ) { }
 
@@ -26,6 +26,7 @@ export class SSORequestService {
     return this.requestGet<UserProfile>(request, '/api/users/me');
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extractCredentials(request: any): string {
     if (!request.headers.authorization) {
       throw new HttpErrors.Unauthorized(`Authorization header not found.`);

@@ -1,11 +1,19 @@
 import { BindingKey } from "@loopback/context";
-import { SequenceActionFn } from './providers/sequence';
+import { PackageInfo } from './type';
+import { SequenceActionFn } from './providers';
+import { TokenService } from '@loopback/authentication';
 
-
-export namespace AlbLoopbackAuthBindings {
+export namespace SSOAuthBindings {
   export const SSO_URL = BindingKey.create<string>(
     'alb.sso.url'
   );
-
+}
+export namespace AlbLoopbackAuthBindings {
+  export const PACKAGE = BindingKey.create<PackageInfo>('alb.packageinfo');
   export const SEQUENCE_PROVIDER = BindingKey.create<SequenceActionFn>('alb.sequence.provider');
+}
+export namespace TokenServiceBindings {
+  export const TOKEN_SERVICE = BindingKey.create<TokenService>(
+    'services.authentication.jwt.tokenservice',
+  );
 }

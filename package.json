@@ -1,7 +1,7 @@
 {
-  "name": "@alborea/loopback-sso-connector",
+  "name": "@alborea/loopback-sso",
   "version": "1.0.8",
-  "description": "Extension to bind application to the alborea auth microservice",
+  "description": "Extension to add authentification based on JWT remote or locally to your loopback application",
   "keywords": [
     "loopback-extension",
     "loopback"
@@ -47,6 +47,7 @@
     "@loopback/context": "^3.9.2",
     "@loopback/core": "^2.9.1",
     "@loopback/rest": "^5.2.0",
+    "@loopback/rest-explorer": "^2.2.7",
     "@types/request-promise-native": "^1.0.17",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"

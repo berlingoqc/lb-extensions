@@ -10,6 +10,6 @@ export class SequenceActionProvider implements Provider<SequenceActionFn> {
   constructor() { }
 
   value(): SequenceActionFn {
-    throw new Error('Methode not implement');
+    return () => new Promise((r) => r());
   }
 }

@@ -1,9 +1,11 @@
-export * from './component';
-export * from './sequence';
-export * from './utils';
+export * from './components';
+export * from './mixins';
+export * from './providers';
 export * from './services';
 export * from './strategies';
-export * from './providers';
-export * from './sequence';
-export * from './init';
+export * from './utils';
+
 export * from './key';
+export * from './sequence';
+export * from './type';
+

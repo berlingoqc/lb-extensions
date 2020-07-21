@@ -16,9 +16,8 @@ import {
   AUTHENTICATION_STRATEGY_NOT_FOUND,
   USER_PROFILE_NOT_FOUND,
 } from '@loopback/authentication';
-import { AlbLoopbackAuthBindings } from './key';
 import { SequenceActionFn } from './providers/sequence';
-import { UserProfile } from '@loopback/security';
+import { AlbLoopbackAuthBindings } from './key';
 
 const SequenceActions = RestBindings.SequenceActions;
 export class AuthenticationSequence implements SequenceHandler {
