@@ -28,6 +28,10 @@ export class SSORequestService {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extractCredentials(request: any): string {
+    let token = request.query.token;
+    if (token) {
+      return token;
+    }
     if (!request.headers.authorization) {
       throw new HttpErrors.Unauthorized(`Authorization header not found.`);
     }
@@ -45,7 +49,7 @@ export class SSORequestService {
       throw new HttpErrors.Unauthorized(
         `Authorization header value has too many parts. It must follow the pattern: 'Bearer xx.yy.zz' where xx.yy.zz is a valid JWT token.`,
       );
-    const token = parts[1];
+    token = parts[1];
 
     return token;
   }
