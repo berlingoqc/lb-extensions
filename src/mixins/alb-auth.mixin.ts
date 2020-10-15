@@ -18,8 +18,9 @@ import {
 import {SECURITY_SCHEME_SPEC} from '../utils';
 import {SequenceActionComponent} from '../components/sequence.component';
 import {JWTRemoteStrategy, JWTAuthenticationStrategy} from '../strategies';
-import {AlbLoopbackAuthComponent} from '../components';
+import {AlbLoopbackAuthComponent, CasbinPolicyRepository} from '../components';
 import {TokenServiceBindings} from '../key';
+import {CasbinComponent} from '../components/casbin/casbin.component';
 
 export function AlbAuthMixin<T extends MixinTarget<Application>>(
   superClass: T,
@@ -32,10 +33,14 @@ export function AlbAuthMixin<T extends MixinTarget<Application>>(
       this.component(AuthorizationComponent);
       this.component(SequenceActionComponent);
 
-      this.bind('authorization.casbin-provider')
-        .toProvider(RoleAuthorizationProvider)
-        .tag(AuthorizationTags.AUTHORIZER);
-
+      if (this.options.casbin) {
+        this.component(CasbinComponent);
+        (this as any).repository(CasbinPolicyRepository);
+      } else {
+        this.bind('authorization.casbin-provider')
+          .toProvider(RoleAuthorizationProvider)
+          .tag(AuthorizationTags.AUTHORIZER);
+      }
       if (this.options.strategy === 'local') {
         registerAuthenticationStrategy(this as any, JWTAuthenticationStrategy);
       } else if (this.options.strategy === 'remote') {

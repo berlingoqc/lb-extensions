@@ -23,3 +23,9 @@ export namespace TokenServiceBindings {
     'authentication.jwt.expires.in.seconds',
   );
 }
+
+export namespace AuthorizationBindings {
+  export const PROVIDER = BindingKey.create<object>(
+    'authorization.casbin-provider',
+  );
+}
