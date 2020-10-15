@@ -1,4 +1,4 @@
-import { inject } from '@loopback/context';
+import {inject} from '@loopback/context';
 import {
   FindRoute,
   InvokeMethod,
@@ -16,13 +16,12 @@ import {
   AUTHENTICATION_STRATEGY_NOT_FOUND,
   USER_PROFILE_NOT_FOUND,
 } from '@loopback/authentication';
-import { SequenceActionFn } from './providers/sequence';
-import { AlbLoopbackAuthBindings } from './key';
+import {SequenceActionFn} from './providers/sequence';
+import {AlbLoopbackAuthBindings} from './key';
 
 const SequenceActions = RestBindings.SequenceActions;
 export class AuthenticationSequence implements SequenceHandler {
-
-  @inject(SequenceActions.INVOKE_MIDDLEWARE, { optional: true })
+  @inject(SequenceActions.INVOKE_MIDDLEWARE, {optional: true})
   protected invokeMiddleware: InvokeMiddleware = () => false;
 
   constructor(
@@ -35,12 +34,12 @@ export class AuthenticationSequence implements SequenceHandler {
     @inject(AuthenticationBindings.AUTH_ACTION)
     protected authenticateRequest: AuthenticateFn,
     @inject(AlbLoopbackAuthBindings.SEQUENCE_PROVIDER)
-    protected sequenceFn: SequenceActionFn
-  ) { }
+    protected sequenceFn: SequenceActionFn,
+  ) {}
 
   async handle(context: RequestContext) {
     try {
-      const { request, response } = context;
+      const {request, response} = context;
       const finished = await this.invokeMiddleware(context);
       if (finished) return;
       const route = this.findRoute(request);
@@ -59,7 +58,7 @@ export class AuthenticationSequence implements SequenceHandler {
         error.code === AUTHENTICATION_STRATEGY_NOT_FOUND ||
         error.code === USER_PROFILE_NOT_FOUND
       ) {
-        Object.assign(error, { statusCode: 401 /* Unauthorized */ });
+        Object.assign(error, {statusCode: 401 /* Unauthorized */});
       }
 
       this.reject(context, error);

@@ -1,8 +1,8 @@
-import { inject } from '@loopback/context';
-import { HttpErrors, Request } from '@loopback/rest';
-import { AuthenticationStrategy, TokenService } from '@loopback/authentication';
-import { UserProfile } from '@loopback/security';
-import { TokenServiceBindings } from '../key';
+import {inject} from '@loopback/context';
+import {HttpErrors, Request} from '@loopback/rest';
+import {AuthenticationStrategy, TokenService} from '@loopback/authentication';
+import {UserProfile} from '@loopback/security';
+import {TokenServiceBindings} from '../key';
 
 export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   name = 'jwt';
@@ -10,7 +10,7 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   constructor(
     @inject(TokenServiceBindings.TOKEN_SERVICE)
     public tokenService: TokenService,
-  ) { }
+  ) {}
 
   async authenticate(request: Request): Promise<UserProfile | undefined> {
     const token: string = this.extractCredentials(request);
@@ -21,7 +21,6 @@ export class JWTAuthenticationStrategy implements AuthenticationStrategy {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   extractCredentials(request: any): string {
     // regarde si on n'a le token en query params
-    console.log(request.query);
     let token = request.query.token;
     if (token) {
       return token;

@@ -10,7 +10,8 @@
     "type": "git",
     "url": "https://github.com/alborea/loopback-sso-extensions/"
   },
-  "main": "index.js",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "engines": {
     "node": ">=8.9"
   },
@@ -41,29 +42,29 @@
     "!*/__tests__"
   ],
   "dependencies": {
-    "@loopback/authentication": "^4.2.9",
-    "@loopback/authorization": "^0.6.2",
-    "@loopback/boot": "^2.3.5",
-    "@loopback/context": "^3.9.2",
-    "@loopback/core": "^2.9.1",
-    "@loopback/rest": "^5.2.0",
-    "@loopback/rest-explorer": "^2.2.7",
+    "@loopback/authentication": "^7.0.2",
+    "@loopback/authorization": "^0.7.2",
+    "@loopback/boot": "^3.0.2",
+    "@loopback/context": "^3.12.0",
+    "@loopback/core": "^2.11.0",
+    "@loopback/rest": "^8.0.0",
+    "@loopback/rest-explorer": "^3.0.2",
     "@types/request-promise-native": "^1.0.17",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.8"
   },
   "devDependencies": {
-    "@loopback/build": "^6.1.0",
+    "@loopback/build": "^6.2.5",
     "source-map-support": "^0.5.19",
-    "@loopback/testlab": "^3.2.0",
-    "@types/node": "^10.17.26",
-    "@typescript-eslint/parser": "^2.31.0",
-    "@typescript-eslint/eslint-plugin": "^2.31.0",
-    "@loopback/eslint-config": "^8.0.3",
-    "eslint": "^7.3.1",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-plugin-eslint-plugin": "^2.2.1",
-    "eslint-plugin-mocha": "^7.0.0",
-    "typescript": "~3.9.5"
+    "@loopback/testlab": "^3.2.7",
+    "@types/node": "^10.17.37",
+    "@typescript-eslint/parser": "^4.4.0",
+    "@typescript-eslint/eslint-plugin": "^4.4.0",
+    "@loopback/eslint-config": "^10.0.1",
+    "eslint": "^7.10.0",
+    "eslint-config-prettier": "^6.12.0",
+    "eslint-plugin-eslint-plugin": "^2.3.0",
+    "eslint-plugin-mocha": "^8.0.0",
+    "typescript": "~4.0.3"
   }
 }

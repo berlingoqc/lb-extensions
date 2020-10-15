@@ -1,22 +1,32 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { MixinTarget, Application } from '@loopback/core';
-import { AuthenticationComponent, registerAuthenticationStrategy } from '@loopback/authentication';
-import { AuthorizationComponent, AuthorizationTags } from '@loopback/authorization';
-import { RoleAuthorizationProvider } from '../providers';
-import { RestApplication } from '@loopback/rest';
-import { AuthenticationSequence } from '../sequence';
-import { RestExplorerBindings, RestExplorerComponent } from '@loopback/rest-explorer';
-import { SECURITY_SCHEME_SPEC } from '../utils';
-import { SequenceActionComponent } from '../components/sequence.component';
-import { JWTRemoteStrategy, JWTAuthenticationStrategy } from '../strategies';
-import { AlbLoopbackAuthComponent } from '../components';
+import {MixinTarget, Application} from '@loopback/core';
+import {
+  AuthenticationComponent,
+  registerAuthenticationStrategy,
+} from '@loopback/authentication';
+import {
+  AuthorizationComponent,
+  AuthorizationTags,
+} from '@loopback/authorization';
+import {RoleAuthorizationProvider} from '../providers';
+import {RestApplication} from '@loopback/rest';
+import {AuthenticationSequence} from '../sequence';
+import {
+  RestExplorerBindings,
+  RestExplorerComponent,
+} from '@loopback/rest-explorer';
+import {SECURITY_SCHEME_SPEC} from '../utils';
+import {SequenceActionComponent} from '../components/sequence.component';
+import {JWTRemoteStrategy, JWTAuthenticationStrategy} from '../strategies';
+import {AlbLoopbackAuthComponent} from '../components';
+import {TokenServiceBindings} from '../key';
 
-
-export function AlbAuthMixin<T extends MixinTarget<Application>>(superClass: T) {
+export function AlbAuthMixin<T extends MixinTarget<Application>>(
+  superClass: T,
+) {
   return class extends superClass {
     constructor(...args: any[]) {
       super(...args);
-      console.log('INITITALIZE AlbAuthMixin');
 
       this.component(AuthenticationComponent);
       this.component(AuthorizationComponent);
@@ -48,8 +58,8 @@ export function AlbAuthMixin<T extends MixinTarget<Application>>(superClass: T) 
           description: this.options.pkg.description,
         },
         paths: {},
-        components: { securitySchemes: SECURITY_SCHEME_SPEC },
-        servers: [{ url: '/api' }],
+        components: {securitySchemes: SECURITY_SCHEME_SPEC},
+        servers: [{url: '/api'}],
       });
 
       restApplication.sequence(AuthenticationSequence as any);
@@ -74,5 +84,14 @@ export function AlbAuthMixin<T extends MixinTarget<Application>>(superClass: T) 
         },
       };
     }
-  }
+
+    initBindings() {
+      this.bind(TokenServiceBindings.TOKEN_SECRET).to(
+        process.env.JWT_SECRET ?? 'test',
+      );
+      this.bind(TokenServiceBindings.TOKEN_EXPIRES_IN).to(
+        process.env.JWT_TTL ?? '3600',
+      );
+    }
+  };
 }
