@@ -5,8 +5,8 @@ import {EnforcerByRoleOrFilter} from '../models';
 import {getSubjectFromId} from '../helpers';
 
 /**
- * Service pour exposer les fonctionnalités de role fournis par Casbin
- * avec un enforcer pour le context
+ * Service pour exposer les fonctionnalités de rôles fournies par Casbin
+ * avec un enforcer pour le contexte
  */
 @bind({scope: BindingScope.TRANSIENT})
 export class RolesService {
