@@ -1,7 +1,6 @@
 # @alborea/loopback-sso-extensions
 
-[![LoopBack](https://github.com/strongloop/loopback-next/raw/master/docs/site/imgs/branding/Powered-by-LoopBack-Badge-(blue)-@2x.png)](http://loopback.io/)
-
+[![LoopBack](<https://github.com/strongloop/loopback-next/raw/master/docs/site/imgs/branding/Powered-by-LoopBack-Badge-(blue)-@2x.png>)](http://loopback.io/)
 
 Ce repository contient une librairie pour venir offrir une suite de fonctionnalité
 supplémentaire dans une application loopback.
@@ -10,15 +9,16 @@ supplémentaire dans une application loopback.
 
 Avec le mixin `AlbAuthMixin` qui ajoute et configure les éléments suivants
 
-* Ajoute composante pour Authentification et Authorization
-* Ajout service de validation des rôles
-* Ajout d'une stratégie pour la récupération des JWT
-  * JWTAutenticationStrategy qui valide le Token localement depuis la requête HTTP
-  * JWTRemoteStrategy qui valide le token avec un serveur SSO remote
-* Configuration de l'application REST avec OpenAPI 3 avec l'information du package.json et la securitySchemes de configurer
-* Configure la séquence d'authentification qui peut être étendu avec `AlbLoopbackAuthBindings.SEQUENCE_PROVIDER`
-* Configure le RestExplorer
-* Configure les controllers
+- Ajoute composante pour Authentification et Authorization
+  - Choix entre [Casbin](/src/components/casbin/README.md) ou basé sur JWT
+- Ajout service de validation des rôles
+- Ajout d'une stratégie pour la récupération des JWT
+  - JWTAutenticationStrategy qui valide le Token localement depuis la requête HTTP
+  - JWTRemoteStrategy qui valide le token avec une instance de @alborea/sso
+- Configuration de l'application REST avec OpenAPI 3 avec l'information du package.json et la securitySchemes de configurer
+- Configure la séquence d'authentification qui peut être étendu avec `AlbLoopbackAuthBindings.SEQUENCE_PROVIDER`
+- Configure le RestExplorer
+- Configure les controllers
 
 Utilisateur de `AlbAuthMixin`:
 
@@ -29,6 +29,8 @@ export async function main(options: AlbAuthConfig = {}) {
   options.dirname = __dirname; // configurer le dirname
   options.pkg = require('../package.json'); // configurer le package info
   options.strategy = 'remote'; // choix de la strategie pour JWT
+  // Optionelle si casbin est désirée
+  options.casbin = true;
 
   // Code par default générer par loopback
   const app = new XmationApplication(options);
@@ -46,7 +48,9 @@ export async function main(options: AlbAuthConfig = {}) {
 }
 
 // application.ts
-export class XmationApplication extends BootMixin(ServiceMixin(RepositoryMixin(AlbAuthMixin(RestApplication)))) {
+export class XmationApplication extends BootMixin(
+  ServiceMixin(RepositoryMixin(AlbAuthMixin(RestApplication))),
+) {
   constructor(options: AlbAuthConfig = {}) {
     super(options);
 
