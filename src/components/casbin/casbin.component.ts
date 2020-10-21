@@ -12,8 +12,8 @@ import {RepositoryEnforcerProvider} from './providers';
  * Component pour fournir les fonctionnalités de Casbin.
  *
  * Utilise le RepositoryEnforcer
- * Fournis /policies
- * Fournis provider pour @authorize
+ * Fournit /policies
+ * Fournit provider pour @authorize
  */
 export class CasbinComponent implements Component {
   constructor() {}
