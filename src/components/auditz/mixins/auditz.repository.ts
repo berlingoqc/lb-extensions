@@ -13,6 +13,7 @@ import {
 import {UserProfile} from '@loopback/security';
 import {HttpErrors} from '@loopback/rest';
 import {AuditzModel} from './auditz.model';
+import {RevisionService} from '../services/revision';
 
 export interface AuditzRepository<T extends Entity & AuditzModel<ID>, ID>
   extends DefaultCrudRepository<T, ID, {}> {
@@ -30,6 +31,11 @@ export interface AuditzRepositorySettings {
   // Si on sauvegarde les informations dans la table de révision
   // false par default
   revision?: boolean;
+  // Nom de la table qu'on applique le mixin
+  // nécessaire pour revision a true
+  table?: string;
+  // Affiche les informations d'auditz lors des finds si true
+  hideAuditzData?: boolean;
 }
 
 function validateFilterRequiredField(filter?: any): Filter {
@@ -42,10 +48,19 @@ function validateFilterRequiredField(filter?: any): Filter {
   return filter;
 }
 
-function modifyFilterForRequest(filter?: any): Filter {
+function modifyFilterForRequest(filter?: any, hideData = true): Filter {
   filter = validateFilterRequiredField(filter);
   filter.where = modifyWhereForRequest(filter.where);
-
+  if (hideData) {
+    filter.fields = {
+      createdAt: false,
+      createdBy: false,
+      updatedBy: false,
+      updatedAt: false,
+      deletedBy: false,
+      deletedAt: false,
+    };
+  }
   return filter;
 }
 
@@ -64,25 +79,37 @@ function modifyWhereForRequest(where: any): Where {
 export function AuditzRepositoryMixin<
   T extends Entity & AuditzModel<ID>,
   ID,
-  R extends MixinTarget<EntityCrudRepository<any, ID, {}>>
+  R extends MixinTarget<EntityCrudRepository<T, ID, {}>>
 >(superClass: R, settings: AuditzRepositorySettings = {}) {
   const softDelete =
     settings.softDeleted == null ||
     settings.softDeleted === undefined ||
     settings.softDeleted === true;
+  if (settings.revision && !settings.table) {
+    throw new Error('Revision is activated but no table name is provided');
+  }
+  const table = settings.table ?? '';
+  const hide = settings.hideAuditzData ?? true;
   class MixedRepository extends superClass {
     // Implémentation de AuditzRepositoryExtraFunction
+
+    // Doit être fournis par la classe enfant
     userGetter: Getter<UserProfile>;
+    // Doit être fournis optionnelement si on active révision
+    revisionService: RevisionService;
 
     findSoftDeleted(filter?: any, options?: object) {
-      filter = modifyFilterForRequest(filter);
+      filter = modifyFilterForRequest(filter, hide);
       filter.where['deletedBy'] = {neq: null};
       return super.find(filter, options);
     }
 
     async restoreByIdSoftDeleted(id: ID): Promise<void> {
       const user = await this.userGetter();
-      return super.updateById(id, {
+      if (settings.revision) {
+        await this.revisionService.onRestore(table, id as any);
+      }
+      await super.updateById(id, {
         deletedAt: null,
         deletedBy: null,
         updatedBy: user.id,
@@ -90,13 +117,16 @@ export function AuditzRepositoryMixin<
       } as any);
     }
 
-    hardDeleteById(id: ID): Promise<void> {
-      return super.deleteById(id);
+    async hardDeleteById(id: ID): Promise<void> {
+      await super.deleteById(id);
+      if (settings.revision) {
+        await this.revisionService.onHardDelete(table, id as any);
+      }
     }
 
     // OVERRIDE
     find = async (filter?: Filter, options?: object) => {
-      return super.find(modifyFilterForRequest(filter) as any, options);
+      return super.find(modifyFilterForRequest(filter, hide) as any, options);
     };
 
     findById = async (id: ID, filter?: any, options?: object) => {
@@ -114,8 +144,12 @@ export function AuditzRepositoryMixin<
       const user = await this.userGetter();
       entity.createdBy = user.id;
       entity.createdAt = new Date();
-      return super.create(entity, options);
+      const data = await super.create(entity, options);
+      if (settings.revision)
+        await this.revisionService.onCreate(table, data, data.getId());
+      return data;
     };
+
     createAll = async (
       entities: DataObject<T>[],
       options?: Options,
@@ -125,25 +159,36 @@ export function AuditzRepositoryMixin<
         entity.createdBy = user.id;
         entity.createdAt = new Date();
       });
-      return super.createAll(entities, options);
+      const datas = await super.createAll(entities, options);
+      if (settings.revision) {
+        for (const data of datas) {
+          await this.revisionService.onCreate(table, data, data.getId());
+        }
+      }
+      return datas;
     };
+
     save = async (entity: T, options?: Options): Promise<T> => {
       const user = await this.userGetter();
       entity.createdBy = user.id;
       entity.createdAt = new Date();
-      return super.save(entity, options);
+      const data = await super.save(entity, options);
+      if (settings.revision) {
+        await this.revisionService.onCreate(table, data, data.getId());
+      }
+      return data;
     };
+
+    // UPDATE
+
     update = async (entity: T, options?: Options): Promise<void> => {
       const user = await this.userGetter();
       entity.updatedAt = new Date();
       entity.updatedBy = user.id;
-      return super.update(entity, options);
-    };
-    delete = async (entity: T, options?: Options): Promise<void> => {
-      const user = await this.userGetter();
-      entity.deletedAt = new Date();
-      entity.deletedBy = user.id;
-      return super.update(entity, options);
+      if (settings.revision) {
+        await this.revisionService.onUpdate(table, entity, entity.getId());
+      }
+      await super.update(entity, options);
     };
 
     updateAll = async (
@@ -156,6 +201,7 @@ export function AuditzRepositoryMixin<
       data.updatedBy = user.id;
       return super.updateAll(data, where, options);
     };
+
     updateById = async (
       id: ID,
       data: DataObject<T>,
@@ -164,7 +210,10 @@ export function AuditzRepositoryMixin<
       const user = await this.userGetter();
       data.updatedAt = new Date();
       data.updatedBy = user.id;
-      return super.updateById(id, data, options);
+      if (settings.revision) {
+        await this.revisionService.onUpdate(table, data, id as any);
+      }
+      await super.updateById(id, data, options);
     };
     replaceById = async (
       id: ID,
@@ -174,7 +223,24 @@ export function AuditzRepositoryMixin<
       const user = await this.userGetter();
       data.updatedAt = new Date();
       data.updatedBy = user.id;
-      return super.replaceById(id, data, options);
+      await super.replaceById(id, data, options);
+      if (settings.revision) {
+        await this.revisionService.onReplace(table, data, id as any);
+      }
+    };
+
+    delete = async (entity: T, options?: Options): Promise<void> => {
+      const user = await this.userGetter();
+      if (softDelete) {
+        entity.deletedAt = new Date();
+        entity.deletedBy = user.id;
+        await super.update(entity, options);
+      } else {
+        await super.delete(entity, options);
+      }
+      if (settings.revision) {
+        await this.revisionService.onDelete(table, entity, entity.getId());
+      }
     };
 
     deleteAll = async (where?: Where<T>, options?: Options): Promise<Count> => {
@@ -188,10 +254,11 @@ export function AuditzRepositoryMixin<
       }
       return super.deleteAll(where, options);
     };
+
     deleteById = async (id: ID, options?: Options): Promise<void> => {
       const user = await this.userGetter();
       if (settings.softDeleted) {
-        return super.updateById(
+        await super.updateById(
           id,
           {
             deletedBy: user.id,
@@ -200,7 +267,10 @@ export function AuditzRepositoryMixin<
           options,
         );
       } else {
-        return super.deleteById(id, options);
+        await super.deleteById(id, options);
+      }
+      if (settings.revision) {
+        await this.revisionService.onDelete(table, {}, id as any);
       }
     };
   }
