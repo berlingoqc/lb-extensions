@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {MixinTarget} from '@loopback/core';
+import {Getter, MixinTarget} from '@loopback/core';
 import {
   Entity,
   DefaultCrudRepository,
@@ -10,6 +10,7 @@ import {
   Count,
   Where,
 } from '@loopback/repository';
+import {UserProfile} from '@loopback/security';
 import {HttpErrors} from '@loopback/rest';
 import {AuditzModel} from './auditz.model';
 
@@ -21,6 +22,14 @@ export interface AuditzRepository<T extends Entity & AuditzModel<ID>, ID>
   restoreByIdSoftDeleted(id: ID): Promise<void>;
   // supprime définitivement un élément
   hardDeleteById(id: ID): Promise<void>;
+}
+
+export interface AuditzRepositorySettings {
+  // Activé par default si non spécifié
+  softDeleted?: boolean;
+  // Si on sauvegarde les informations dans la table de révision
+  // false par default
+  revision?: boolean;
 }
 
 function validateFilterRequiredField(filter?: any): Filter {
@@ -56,16 +65,21 @@ export function AuditzRepositoryMixin<
   T extends Entity & AuditzModel<ID>,
   ID,
   R extends MixinTarget<EntityCrudRepository<any, ID, {}>>
->(superClass: R) {
+>(superClass: R, settings: AuditzRepositorySettings = {}) {
+  const softDelete =
+    settings.softDeleted == null ||
+    settings.softDeleted === undefined ||
+    settings.softDeleted === true;
   class MixedRepository extends superClass {
     // Implémentation de AuditzRepositoryExtraFunction
-    userGetter: any;
+    userGetter: Getter<UserProfile>;
 
     findSoftDeleted(filter?: any, options?: object) {
       filter = modifyFilterForRequest(filter);
       filter.where['deletedBy'] = {neq: null};
       return super.find(filter, options);
     }
+
     async restoreByIdSoftDeleted(id: ID): Promise<void> {
       const user = await this.userGetter();
       return super.updateById(id, {
@@ -75,12 +89,13 @@ export function AuditzRepositoryMixin<
         updatedAt: new Date(),
       } as any);
     }
+
     hardDeleteById(id: ID): Promise<void> {
       return super.deleteById(id);
     }
 
     // OVERRIDE
-    find = (filter?: Filter, options?: object) => {
+    find = async (filter?: Filter, options?: object) => {
       return super.find(modifyFilterForRequest(filter) as any, options);
     };
 
@@ -161,24 +176,32 @@ export function AuditzRepositoryMixin<
       data.updatedBy = user.id;
       return super.replaceById(id, data, options);
     };
+
     deleteAll = async (where?: Where<T>, options?: Options): Promise<Count> => {
       const user = await this.userGetter();
-      const entity = {
-        deletedBy: user.id,
-        deletedAt: new Date(),
-      };
-      return super.updateAll(entity, where, options);
+      if (softDelete) {
+        const entity = {
+          deletedBy: user.id,
+          deletedAt: new Date(),
+        };
+        return super.updateAll(entity, where, options);
+      }
+      return super.deleteAll(where, options);
     };
     deleteById = async (id: ID, options?: Options): Promise<void> => {
       const user = await this.userGetter();
-      return super.updateById(
-        id,
-        {
-          deletedBy: user.id,
-          deletedAt: new Date(),
-        },
-        options,
-      );
+      if (settings.softDeleted) {
+        return super.updateById(
+          id,
+          {
+            deletedBy: user.id,
+            deletedAt: new Date(),
+          },
+          options,
+        );
+      } else {
+        return super.deleteById(id, options);
+      }
     };
   }
   return MixedRepository;
