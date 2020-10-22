@@ -1,7 +1,7 @@
 import {authenticate} from '@loopback/authentication';
 import {authorize} from '@loopback/authorization';
 import {SecurityBindings, UserProfile} from '@loopback/security';
-import {inject, service} from '@loopback/core';
+import {Constructor, inject, service} from '@loopback/core';
 import {
   Count,
   CountSchema,
@@ -23,14 +23,27 @@ import {
 import {CasbinPolicyRepository} from '../repositories';
 import {RolesService} from '../services/roles.service';
 import {CasbinPolicy} from '../models';
+import {AuditzControllerMixin} from '../../auditz/mixins/auditz.controller';
+import {voterInjectRessourceId} from '../helpers';
 
-export class PoliciesController {
+export class PoliciesController extends AuditzControllerMixin<
+  CasbinPolicy,
+  number,
+  Constructor<object>
+>(Object, {
+  basePath: '/policies',
+  ressource: 'policy',
+  modelClass: CasbinPolicy,
+}) {
   constructor(
     @repository(CasbinPolicyRepository)
     private casbinPolicyRepository: CasbinPolicyRepository,
     @service(RolesService)
     private roleService: RolesService,
-  ) {}
+  ) {
+    super();
+    this.repository = this.casbinPolicyRepository;
+  }
 
   // CUSTOM
 
@@ -168,6 +181,7 @@ export class PoliciesController {
     resource: 'policy',
     scopes: ['findById'],
     allowedRoles: ['policymanager'],
+    voters: [voterInjectRessourceId(0)],
   })
   async findById(
     @param.path.number('id') id: number,
@@ -189,6 +203,7 @@ export class PoliciesController {
     resource: 'policy',
     scopes: ['updateById'],
     allowedRoles: ['policymanager'],
+    voters: [voterInjectRessourceId(0)],
   })
   async updateById(
     @param.path.number('id') id: number,
@@ -216,6 +231,7 @@ export class PoliciesController {
     resource: 'policy',
     scopes: ['replaceById'],
     allowedRoles: ['policymanager'],
+    voters: [voterInjectRessourceId(0)],
   })
   async replaceById(
     @param.path.number('id') id: number,
@@ -236,6 +252,7 @@ export class PoliciesController {
     resource: 'policy',
     scopes: ['deleteById'],
     allowedRoles: ['policymanager'],
+    voters: [voterInjectRessourceId(0)],
   })
   async deleteById(@param.path.number('id') id: number): Promise<void> {
     await this.casbinPolicyRepository.deleteById(id);
