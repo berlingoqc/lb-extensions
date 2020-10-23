@@ -80,7 +80,6 @@ export class RevisionService {
         request.connection.remoteAddress,
       createdAt: new Date(),
     });
-
     return this.revisionRepository.create(revision);
   }
 }
