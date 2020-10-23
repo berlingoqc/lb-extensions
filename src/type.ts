@@ -1,4 +1,4 @@
-import { ApplicationConfig } from '@loopback/core';
+import {ApplicationConfig} from '@loopback/core';
 
 export interface PackageInfo {
   name: string;

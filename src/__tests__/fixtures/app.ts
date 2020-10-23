@@ -21,7 +21,6 @@ export async function setupApplication(
 
   await init(app);
   await app.boot();
-  await app.migrateSchema();
   await app.start();
 
   const client = createRestAppClient(app);
