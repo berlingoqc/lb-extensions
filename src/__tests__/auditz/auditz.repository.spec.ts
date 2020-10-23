@@ -8,16 +8,14 @@ import {
   juggler,
 } from '@loopback/repository';
 import {RestBindings} from '@loopback/rest';
-import {UserProfile, SecurityBindings, securityId} from '@loopback/security';
-import {expect, sinon} from '@loopback/testlab';
+import {UserProfile, SecurityBindings} from '@loopback/security';
+import {expect} from '@loopback/testlab';
 import {
   AuditzComponent,
   AuditzModelMixin,
   AuditzRepository,
   AuditzRepositoryMixin,
   AuditzRepositorySettings,
-  CasbinBindings,
-  RevisionRepository,
   RevisionService,
 } from '../../components';
 import {setupApplication, TestApplication} from '../fixtures/app';
@@ -35,7 +33,7 @@ export class CustomModel extends AuditzModelMixin(BaseEntity) {
   autre: string;
 }
 
-describe.only('Repository avec AuditzMixin sans revision', () => {
+describe('Repository avec AuditzMixin sans revision', () => {
   let app: TestApplication;
   let repo: AuditzRepository<CustomModel, number>;
   before('setupApp', async () => {
