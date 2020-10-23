@@ -1,6 +1,6 @@
 # Casbin component
 
-Component qui fournis les éléments suivants:
+Composant qui fournit les éléments suivants:
 
 - Repository pour stocker les CasbinPolicy
 - Controller qui expose les CasbinPolicy
@@ -10,7 +10,7 @@ Component qui fournis les éléments suivants:
 - Différentes factory pour les enforcer loopback.
   - FileFactory : depuis des fichiers CSV
   - RepositoryFactory : depuis un repository avec des filters
-- Utilitaire pour inject le subject depuis la request
+- Utilitaire pour injecter le subject depuis la request
 - Utilitaire pour injecter des attributs ABAC dans l'object de la request casbin
 
 ### Utilisation
@@ -34,7 +34,7 @@ this.bind(CasbinBindings.MODEL_PATH).to(
 Optionnel:
 
 ```ts
-// Si vous utiliser le FileEnforcerProvider
+// Si vous utilisez le FileEnforcerProvider
 this.bind(CasbinBindings.POLICIES_PATH).to({
   admin: join(__dirname, '../casbin/rbac_policy.admin.csv'),
 });
@@ -47,7 +47,7 @@ this.bind(CasbinBindings.POLICIES_PATH).to({
 Utilisation d'un enforcer:
 
 ```ts
-// Nécessaire d'être authentifier pour utiliser la directive @authorize
+// Nécessaire d'être authentifié(e) pour utiliser la directive @authorize
 @authenticate('jwt')
 @authorize({
   // Nécessaire, correspond à l'object. Devrait être similaire dans le même controlleur
@@ -55,11 +55,11 @@ Utilisation d'un enforcer:
   // Nécessaire, correspond à l'action
   scopes: ['action'],
   // Optionel, optimise la recherche en cherchant seulement dans
-  // les policies qui correspond au role nécessaire.
-  // Pour une action avec des rôles dynamique ne pas utilisé
+  // les policies qui correspondent au role nécessaire.
+  // Pour une action avec des rôles dynamiques, ne pas utiliser
   // pour chercher dans toutes les entrées
   allowedRoles: ['role1', 'role2'],
-  // Aussi des voters peuvent être ajouté pour injecter des datas
+  // Aussi des voters peuvent être ajoutés pour injecter des data
   // ou pour voter sur l'authorization
   voters: []
 })
