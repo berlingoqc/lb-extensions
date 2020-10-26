@@ -12,6 +12,10 @@ export interface ClassMixinDecoratorInfo {
   properties: DecoratorProperties;
 }
 
+export interface ControllerMixinOptions extends ClassMixinDecoratorInfo {
+  basePath?: string;
+}
+
 export function getPropertie(properties?: DecoratorProperties, name?: string) {
   if (properties instanceof Array) {
     return properties;
