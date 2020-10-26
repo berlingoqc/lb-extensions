@@ -9,7 +9,7 @@ Fonctionnalité à reproduire les points suivant:
 - Soft Deletes
 - Timestamps update/create/delete
 - Enregistre ID de l'user qui execute l'opération
-- Logging des révisions dans une table séparé (manquant)
+- Logging des révisions dans une table séparé
 
 Ajout les points suivants:
 
@@ -20,6 +20,7 @@ Ajout les points suivants:
 - Application de AuditzModelMixin
 - Application de AuditzRepositoryMixin
 - Application de AuditzControllerMixin (optionel)
+- Ajout des informations de modification dans la table de révision (optionel)
 
 ```ts
 // Création de votre model avec AuditzModelMixin
@@ -29,6 +30,14 @@ export class CustomModel extends AuditzModelMixin(BaseEntity) {
   id: number;
 }
 
+// Config pour activer la révision , peux être supprimer ou mis a null
+// si vous ne désirez pas de révision
+const configRevision = {
+  revision: true,
+  table: 'CustomModel'
+}
+
+
 // Création de votre repository avec AuditzRepositoryMixin
 export class CustomModelRepository extends AuditzRepositoryMixin<
   CustomModel,
@@ -36,7 +45,7 @@ export class CustomModelRepository extends AuditzRepositoryMixin<
   Constructor<
     DefaultCrudRepository<CustomModel, typeof CustomModel.prototype.id, {}>
   >
->(DefaultCrudRepository) {
+>(DefaultCrudRepository, configRevision) {
   constructor(
     @inject('datasources.postregsql') dataSource: juggler.DataSource,
     @inject.getter(SecurityBindings.USER)

@@ -1,27 +1,23 @@
-import {bind, /* inject, */ BindingScope, inject} from '@loopback/core';
-import {Request, HttpErrors} from '@loopback/rest';
-import {UserProfile} from '@loopback/security';
+import { bind, /* inject, */ BindingScope, inject } from '@loopback/core';
+import { Request, HttpErrors } from '@loopback/rest';
+import { UserProfile } from '@loopback/security';
 
 import * as rp from 'request-promise-native';
-import {SSOAuthBindings} from '../key';
+import { SSOAuthBindings } from '../key';
 
-@bind({scope: BindingScope.TRANSIENT})
+@bind({ scope: BindingScope.TRANSIENT })
 export class SSORequestService {
   constructor(
     @inject(SSOAuthBindings.SSO_URL)
-    private readonly apiAuthURL: string,
-  ) {}
+    private readonly apiAuthURL: string
+  ) { }
 
-  async requestGet<T>(
-    request: Request,
-    path: string,
-    params: {[id: string]: unknown} = {},
-  ): Promise<T> {
+  async requestGet<T>(request: Request, path: string, params: { [id: string]: unknown } = {}): Promise<T> {
     const token = this.extractCredentials(request);
     const resp = await rp.get(this.apiAuthURL + path, {
       headers: {
-        authorization: 'Bearer ' + token,
-      },
+        'authorization': 'Bearer ' + token
+      }
     });
     return JSON.parse(resp);
   }
