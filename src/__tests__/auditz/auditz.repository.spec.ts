@@ -56,7 +56,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
   });
 
   describe("Construction d'un Repository avec le mixin", () => {
-    it('Activer revision sans spécifié le nom de la table doit être rejeté', async () => {
+    it('Activer revision sans spécifier le nom de la table doit être rejeté', async () => {
       await expect(setRepo({revision: true})).to.be.rejectedWith(Error);
     });
 
@@ -66,7 +66,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
       ).to.not.be.rejected();
     });
 
-    it("Par default ne doit pas retourné les informations d'auditz", async () => {
+    it("Par défaut ne doit pas retourner les informations d'auditz", async () => {
       repo = await setContext({
         id: '123',
         data: [{autre: 'dsa'}],
@@ -82,7 +82,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
       expect(findData[0].deletedBy).undefined();
     });
 
-    it("Active le retour par default des informations d'auditz", async () => {
+    it("Active le retour par défaut des informations d'auditz", async () => {
       repo = await setContext({
         id: '123',
         config: {hideAuditzData: false},
@@ -109,7 +109,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
       expect(softDeletedItems.length).to.equal(1);
     });
 
-    it('Désactive le hardDelete , item devrait être supprimé de facon permanante', async () => {
+    it('Désactive le hardDelete, item devrait être supprimé de façon permanente', async () => {
       repo = await setContext({
         id: '123',
         config: {softDeleted: false}, // config par default
@@ -124,7 +124,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
     });
   });
 
-  it('Ne peux pas accéder a une ressource avec Audit si non connecter', async () => {
+  it('Ne peux pas accéder à une ressource avec Audit si non connecté', async () => {
     repo = await setRepo();
     const promiseCreate = repo.create({});
     await expect(promiseCreate).to.be.rejected();
