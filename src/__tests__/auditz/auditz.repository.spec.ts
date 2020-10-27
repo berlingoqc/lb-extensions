@@ -55,18 +55,19 @@ describe('Repository avec AuditzMixin sans revision', () => {
     await app.stop();
   });
 
-  it('Ne peux pas accéder a une ressource avec Audit si non connecter', async () => {
-    repo = await setRepo();
-    try {
-      await repo.create({});
-      expect(false).to.true();
-    } catch (ex) {
-      expect(ex);
-    }
-  });
+  // AJOUTER CASE pour le constructeur du repository
+  describe("Construction d'un Repository avec le mixin", () => {
+    it('Activer revision sans spécifié le nom de la table doit être rejeté', async () => {
+      await expect(setRepo({revision: true})).to.be.rejectedWith(Error);
+    });
 
-  describe('Opération find avec AuditzMixin', () => {
-    it('Ne doit pas contenir les propriétés de Auditz', async () => {
+    it('Activer revision avec le nom de la table', async () => {
+      await expect(
+        setRepo({revision: true, table: 'CustomModel'}),
+      ).to.not.be.rejected();
+    });
+
+    it("Par default ne doit pas retourné les informations d'auditz", async () => {
       repo = await setContext({
         id: '123',
         data: [{autre: 'dsa'}],
@@ -82,7 +83,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
       expect(findData[0].deletedBy).undefined();
     });
 
-    it('Doit contenir les propriétés de Auditz', async () => {
+    it("Active le retour par default des informations d'auditz", async () => {
       repo = await setContext({
         id: '123',
         config: {hideAuditzData: false},
@@ -95,6 +96,26 @@ describe('Repository avec AuditzMixin sans revision', () => {
       expect(findData[0].createdAt).Date();
     });
 
+    it('Par default le softDelete devrait être utilisé', async () => {
+      repo = await setContext({
+        id: '123',
+        config: {softDeleted: true}, // config par default
+        data: [{autre: 'dsa'}],
+      });
+
+      await expect(repo.deleteById(1)).to.fulfilled();
+    });
+
+    it('Désactive le hardDelete , item devrait être supprimé de facon permanante', async () => {});
+  });
+
+  it('Ne peux pas accéder a une ressource avec Audit si non connecter', async () => {
+    repo = await setRepo();
+    const promiseCreate = repo.create({});
+    await expect(promiseCreate).to.be.rejected();
+  });
+
+  describe('Opération find avec AuditzMixin', () => {
     it("Ne doit pas retourner d'élément supprimer", async () => {
       repo = await setContext({
         id: '123',
@@ -110,7 +131,6 @@ describe('Repository avec AuditzMixin sans revision', () => {
   });
 
   describe('Opération create avec AuditzMixin', () => {
-    // your unit tests
     it('Create doit contenir date et id de création ', async () => {
       repo = await setContext({id: '123'});
       const data = await repo.create({autre: 'firstdata'});
@@ -128,6 +148,11 @@ describe('Repository avec AuditzMixin sans revision', () => {
         config: {hideAuditzData: false},
         data: [{autre: 'dsa'}],
       });
+
+      const itemBeforeUpdate = await repo.findById(1);
+
+      expect(itemBeforeUpdate.updatedAt).to.be.undefined();
+      expect(itemBeforeUpdate.updatedBy).to.be.undefined();
 
       await repo.updateById(1, {autre: '123'});
 
