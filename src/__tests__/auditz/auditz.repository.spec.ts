@@ -55,7 +55,6 @@ describe('Repository avec AuditzMixin sans revision', () => {
     await app.stop();
   });
 
-  // AJOUTER CASE pour le constructeur du repository
   describe("Construction d'un Repository avec le mixin", () => {
     it('Activer revision sans spécifié le nom de la table doit être rejeté', async () => {
       await expect(setRepo({revision: true})).to.be.rejectedWith(Error);
@@ -104,9 +103,25 @@ describe('Repository avec AuditzMixin sans revision', () => {
       });
 
       await expect(repo.deleteById(1)).to.fulfilled();
+
+      const softDeletedItems = await repo.findSoftDeleted();
+
+      expect(softDeletedItems.length).to.equal(1);
     });
 
-    it('Désactive le hardDelete , item devrait être supprimé de facon permanante', async () => {});
+    it('Désactive le hardDelete , item devrait être supprimé de facon permanante', async () => {
+      repo = await setContext({
+        id: '123',
+        config: {softDeleted: false}, // config par default
+        data: [{autre: 'dsa'}],
+      });
+
+      await expect(repo.deleteById(1)).to.fulfilled();
+
+      const softDeletedItems = await repo.findSoftDeleted();
+
+      expect(softDeletedItems.length).to.equal(0);
+    });
   });
 
   it('Ne peux pas accéder a une ressource avec Audit si non connecter', async () => {
@@ -116,7 +131,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
   });
 
   describe('Opération find avec AuditzMixin', () => {
-    it("Ne doit pas retourner d'élément supprimer", async () => {
+    it("Ne doit pas retourner d'élément supprimé", async () => {
       repo = await setContext({
         id: '123',
         config: {softDeleted: true},
@@ -141,7 +156,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
     });
   });
 
-  describe('Update', () => {
+  describe('Opération update avec AuditzMixin', () => {
     it('Apres modification doit contenir updatedBy et updatedAt', async () => {
       repo = await setContext({
         id: '123',

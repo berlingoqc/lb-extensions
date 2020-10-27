@@ -1,5 +1,5 @@
-p,policymanager,policy,find,
-g,u1,policymanager
+p, policymanager, policy, find
+g, u1, policymanager
 g, sousgroup, policymanager
-g,u2,sousgroup
+g, u2, sousgroup
 
