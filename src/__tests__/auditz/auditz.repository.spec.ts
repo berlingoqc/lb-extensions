@@ -55,7 +55,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
     await app.stop();
   });
 
-  it('Ne peux pas accéder a une ressource avec Audit si non connecter', async () => {
+  it('Ne peux pas accéder a une ressource avec Audit si non connecté', async () => {
     repo = await setRepo();
     try {
       await repo.create({});
@@ -95,7 +95,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
       expect(findData[0].createdAt).Date();
     });
 
-    it("Ne doit pas retourner d'élément supprimer", async () => {
+    it("Ne doit pas retourner d'élément supprimé", async () => {
       repo = await setContext({
         id: '123',
         config: {softDeleted: true},
@@ -121,7 +121,7 @@ describe('Repository avec AuditzMixin sans revision', () => {
     });
   });
 
-  describe('Update', () => {
+  describe('Opération update avec AuditzMixin', () => {
     it('Apres modification doit contenir updatedBy et updatedAt', async () => {
       repo = await setContext({
         id: '123',

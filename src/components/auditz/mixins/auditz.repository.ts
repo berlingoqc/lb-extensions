@@ -70,7 +70,7 @@ function modifyWhereForRequest(where: any): Where {
 }
 
 /**
- * Mixin pour executés les opération d'audits dans
+ * Mixin pour executer les opérations d'audits dans
  * un repository sur une entitée qui utilise le model
  * mixin AuditzModelMixin
  * implémente AuditzRepository

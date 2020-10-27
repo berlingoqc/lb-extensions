@@ -15,9 +15,9 @@ export interface AuditzControllerOptions {
   ressource: string;
   // Path de base pour les endpoints
   basePath: string;
-  // Class du model exposer pour les schema OpenAPI
+  // Classe du modèle exposé pour les schémas OpenAPI
   modelClass?: Constructor<object>;
-  // Roles pour accéder au endpoint
+  // Rôles pouvant accéder au endpoint
   roles?: string[];
 }
 
@@ -37,7 +37,7 @@ export function AuditzControllerMixin<
 >(superClass: T, options: AuditzControllerOptions) {
   const voterSubject = voterInjectRessourceId(0);
   class MixedController extends superClass {
-    // Doit être founis par la class enfant
+    // Doit être founi par la classe enfant
     repository: AuditzRepository<M, ID>;
 
     @get(`${options.basePath}/restore`)

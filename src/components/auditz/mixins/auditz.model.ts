@@ -18,7 +18,7 @@ export interface AuditzModel<P> {
  * qui ajoute des champs pour auditer
  * les modifications sur une table
  *
- * @param superClass - Class de Basee
+ * @param superClass - Classe de base
  * @typeParam T - Model de la class
  */
 export function AuditzModelMixin<T extends MixinTarget<Model>>(superClass: T) {
