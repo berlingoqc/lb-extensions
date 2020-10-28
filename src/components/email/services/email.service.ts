@@ -12,7 +12,7 @@ import {IEmailTemplate} from '../models';
 @model()
 export class RenderEmail {
   @property()
-  title: string;
+  title?: string;
   @property()
   body: string;
 }
@@ -94,8 +94,11 @@ export class EmailSenderService {
         );
       }
     }
-    const templateBody = dot.template(template.template)(data);
-    const templateHeader = dot.template(template.title)(titleData);
+    const templateBody = dot.template(template.body)(data);
+    let templateHeader;
+    if (template.title) {
+      templateHeader = dot.template(template.title)(titleData);
+    }
     return {title: templateHeader, body: templateBody};
   }
 
