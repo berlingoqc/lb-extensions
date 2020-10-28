@@ -18,3 +18,9 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.READ_PACKAGES_PAT }}
       - name: Test
         run: npm run test:dev
+        env:
+          EMAIL_TYPE: 'SMTP'
+          EMAIL_HOST: ${{secrets.EMAIL_HOST}}
+          EMAIL_PORT: ${{secrets.EMAIL_PORT}}
+          EMAIL_USER: ${{secrets.EMAIL_USER}}
+          EMAIL_PASS: ${{secrets.EMAIL_PASS}}
