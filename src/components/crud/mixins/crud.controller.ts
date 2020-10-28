@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {Constructor, MixinTarget} from '@loopback/core';
+import {Constructor, inject, MixinTarget} from '@loopback/core';
 import {
   DefaultCrudRepository,
   Entity,
@@ -34,10 +34,19 @@ import {
 // ModelDef : définition d'une model qui peux être exposer
 export type ModelDef = Function & {prototype: any} & typeof Model;
 
+// Optons pour un CrudControllerMixin
 export interface CrudControllerMixinOptions extends ControllerMixinOptions {
+  // nom de la ressource pour le path {basepath}/{name}
   name: string;
-  id: string;
-  idType: string;
+  // nom de la variable qui correspond a l'identifiant de l'entité
+  // par default ID
+  id?: string;
+  // type de l'identifant
+  // par default number
+  idType?: string;
+  // si le ID est générer automatiquement
+  // par default omitId est a true
+  omitId?: boolean;
 }
 
 // Decorator to add to an operation that
@@ -53,33 +62,46 @@ export function disable() {
 }
 
 /**
- *
- * @param app
- * @param modelDef
- * @param repo
- * @param options
+ * Ajoute un CRUD Controller anonyme à partir d'un model qui possède un repository
  */
-export const getCRUDController = <E extends Entity, ID>(
+export const addCRUDController = <E extends Entity, ID>(
   app: RestApplication,
+  // classe de l'Entityé
   modelDef: ModelDef,
-  repo: string | Class<Repository<Model>>,
+  // paramètre pour l'injection du repository avec @repository()
+  repo: string | Class<Repository<Model>> | DefaultCrudRepository<E, ID, {}>,
   options: CrudControllerMixinOptions,
 ) => {
+  const name =
+    typeof repo === 'string'
+      ? repo
+      : repo instanceof DefaultCrudRepository
+      ? 'null'
+      : repo.name;
+
   class Test extends CrudControllerMixin<Constructor<object>, E, ID>(
     Object,
     modelDef,
     options,
   ) {
     constructor(
-      @repository(repo)
+      @inject(`repositories.${name}`, {optional: true})
       crudRepository: DefaultCrudRepository<any, any, {}>,
     ) {
       super();
+      if (!crudRepository) {
+        if (repo instanceof DefaultCrudRepository) {
+          crudRepository = repo as DefaultCrudRepository<any, any, {}>;
+        } else {
+          throw new Error('Cound not inject a repository');
+        }
+      }
       this.repository = crudRepository;
     }
   }
 
-  app.controller(Test);
+  const bindings = app.controller(Test);
+  return bindings.key;
 };
 
 /**
@@ -106,14 +128,20 @@ export function CrudControllerMixin<
   // base path for binding
   const basePath = `${options.basePath ?? ''}/${options.name}`;
 
+  if (!options.id) options.id = 'id';
+  if (!options.idType) options.idType = 'number';
+
+  const omitId =
+    options.omitId === undefined || options.omitId === true ? [options.id] : [];
+
   // wrap to use to correct property decorator to get id from request
   function parampath() {
     return (target: object, member: string, index: number) => {
       switch (options.idType) {
         case 'string':
-          return param.path.string(options.id)(target, member, index);
+          return param.path.string(options.id as string)(target, member, index);
         case 'number':
-          return param.path.number(options.id)(target, member, index);
+          return param.path.number(options.id as string)(target, member, index);
         default:
           throw new HttpErrors.UnprocessableEntity(
             'ID must be string or number',
@@ -141,7 +169,7 @@ export function CrudControllerMixin<
           'application/json': {
             schema: getModelSchemaRef(repoEntity, {
               title: 'NewEntity',
-              exclude: ['id'],
+              exclude: omitId,
             }),
           },
         },
