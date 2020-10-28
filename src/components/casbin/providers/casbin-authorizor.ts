@@ -52,7 +52,7 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
     object.Name = resourceId ?? metadata.resource ?? authorizationCtx.resource;
 
     const request = {
-      subject: getSubjectFromId(authorizationCtx.principals[0].id),
+      subject: getSubjectFromId(authorizationCtx.principals[0]?.id ?? ''),
       object,
       action: metadata.scopes?.[0] ?? CasbinAuthorizationProvider.DEFAULT_SCOPE,
     };

@@ -1,10 +1,7 @@
 import {Entity, model, property} from '@loopback/repository';
+import {AuditzModelMixin} from '../../auditz/mixins/auditz.model';
 
-/**
- * Basée sur https://github.com/node-casbin/typeorm-adapter/blob/master/src/casbinRule.ts
- */
-@model()
-export class CasbinPolicy extends Entity {
+class PolicyBase extends Entity {
   @property({
     id: true,
     generated: true,
@@ -32,3 +29,8 @@ export class CasbinPolicy extends Entity {
   @property()
   v5: string;
 }
+/**
+ * Basée sur https://github.com/node-casbin/typeorm-adapter/blob/master/src/casbinRule.ts
+ */
+@model()
+export class CasbinPolicy extends AuditzModelMixin(PolicyBase) {}
