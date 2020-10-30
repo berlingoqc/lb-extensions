@@ -44,7 +44,7 @@ export interface CrudControllerMixinOptions extends ControllerMixinOptions {
   // type de l'identifant
   // par default number
   idType?: string;
-  // si le ID est générer automatiquement
+  // si le ID est généré automatiquement
   // par default omitId est a true
   omitId?: boolean;
 }
@@ -66,7 +66,7 @@ export function disable() {
  */
 export const addCRUDController = <E extends Entity, ID>(
   app: RestApplication,
-  // classe de l'Entityé
+  // classe de l'Entité
   modelDef: ModelDef,
   // paramètre pour l'injection du repository avec @repository()
   repo: string | Class<Repository<Model>> | DefaultCrudRepository<E, ID, {}>,
