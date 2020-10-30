@@ -1,4 +1,4 @@
-import {Provider} from '@loopback/core';
+import { Provider } from '@loopback/core';
 import {
   Authorizer,
   AuthorizationContext,
@@ -6,9 +6,10 @@ import {
   AuthorizationDecision,
 } from '@loopback/authorization';
 
+
 // Class level authorizer
 export class RoleAuthorizationProvider implements Provider<Authorizer> {
-  constructor() {}
+  constructor() { }
 
   /**
    * @returns authenticateFn
@@ -24,7 +25,7 @@ export class RoleAuthorizationProvider implements Provider<Authorizer> {
     const roles: string[] = metadata.allowedRoles ?? [];
     const userRoles: string[] = authorizationCtx.principals[0].roles;
     let allow = false;
-    roles.forEach((x) => {
+    roles.forEach(x => {
       if (userRoles.indexOf(x) > -1) {
         allow = true;
       }
