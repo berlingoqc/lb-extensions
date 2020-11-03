@@ -35,6 +35,10 @@ export class EmailSenderService {
     @inject('repositories.EmailTemplatRepository', {optional: true})
     public emailTemplateRepo: EmailTemplateRepository,
   ) {
+    this.setupTransport(transport);
+  }
+
+  setupTransport(transport: mailer.Transport) {
     this.transporter = mailer.createTransport(transport);
   }
 
@@ -74,7 +78,7 @@ export class EmailSenderService {
       subject: renderTemplate.title,
       html: renderTemplate.body,
     };
-    const sendData = await this.transporter.sendMail(
+    const sendData = await this.sendMail(
       Object.assign(options ?? {}, sendOptions),
     );
     return {template: renderTemplate, sendData};

@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-invalid-this */
-import {expect, supertest} from '@loopback/testlab';
+import {expect, supertest, sinon} from '@loopback/testlab';
 import {addEmailTemplateController} from '../../components/email/controllers/template';
 import {
   EmailComponent,
@@ -12,7 +12,6 @@ import {setupApplication, TestApplication} from '../fixtures/app';
 import {TestDataSource} from '../fixtures/datasource';
 
 describe('Email Component', function () {
-  this.timeout(20000);
   let app: TestApplication;
   let client: supertest.SuperTest<supertest.Test>;
 
@@ -29,19 +28,7 @@ describe('Email Component', function () {
 
         testapp.component(EmailComponent);
 
-        testapp.bind(EmailBindings.TRANSPORTER).to({
-          type: process.env.EMAIL_TYPE,
-          host: process.env.EMAIL_HOST,
-          tls: {
-            rejectUnauthorized: false,
-            ciphers: 'SSLv3',
-          },
-          post: process.env.EMAIL_PORT,
-          auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
-          },
-        });
+        testapp.bind(EmailBindings.TRANSPORTER).to({});
       },
     ));
   });
@@ -55,6 +42,12 @@ describe('Email Component', function () {
 
     beforeEach(async () => {
       service = await app.get('services.EmailSenderService');
+      sinon.replace(service, 'setupTransport', sinon.fake());
+      sinon.replace(
+        service,
+        'sendMail',
+        sinon.fake.resolves({accepted: ['info@alborea.com'], rejected: []}),
+      );
     });
 
     describe('Test construction', () => {
@@ -62,13 +55,6 @@ describe('Email Component', function () {
         await expect(
           service.sendMailFromTemplate('info@alborea.com', 'template'),
         ).to.be.rejected();
-      });
-      it("Provier EMAIL_FROM donc pas besoin de spécifié de from lors d'envoie", async () => {
-        app.bind(EmailBindings.EMAIL_FROM).to('portail@alphard.com');
-        service = await app.get('services.EmailSenderService');
-        await expect(
-          service.sendMailFromTemplate('info@alborea.com', {body: 'Template'}),
-        ).to.be.fulfilled();
       });
     });
 
@@ -88,12 +74,12 @@ describe('Email Component', function () {
       const bodyData = {data: 4};
       const titleData = {quoi: 'oui'};
       const template = {
-        body: '<p>I like to dance {{=it.data}}</p>',
-        title: 'Un titre {{=it.quoi}}',
+        body: '<p>{{=it.data}}</p>',
+        title: '{{=it.quoi}}',
       };
       const templateResolved = {
-        title: 'Un titre oui',
-        body: '<p>I like to dance 4</p>',
+        title: 'oui',
+        body: '<p>4</p>',
       };
 
       it('Render simplement une template', async () => {
@@ -115,6 +101,15 @@ describe('Email Component', function () {
 
         expect(sendData.sendData.accepted).to.be.eql(['info@alborea.com']);
         expect(sendData.sendData.rejected).to.be.empty();
+      });
+
+      it("Si une variable n'est pas déclaré le résultat est undefined", async () => {
+        const renderEmailTemplate = await service.renderTemplate(
+          template,
+          {},
+          {},
+        );
+        expect(renderEmailTemplate.body).to.eql('<p>undefined</p>');
       });
 
       describe('Envoie avec EmailTemplateComponent', () => {

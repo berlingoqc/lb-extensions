@@ -21,11 +21,5 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.READ_PACKAGES_PAT }}
       - name: Running test
         run: npm run test
-        env:
-          EMAIL_TYPE: 'SMTP'
-          EMAIL_HOST: ${{secrets.EMAIL_HOST}}
-          EMAIL_PORT: ${{secrets.EMAIL_PORT}}
-          EMAIL_USER: ${{secrets.EMAIL_USER}}
-          EMAIL_PASS: ${{secrets.EMAIL_PASS}}
       - name: Publishing
         run: npm publish
