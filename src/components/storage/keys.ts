@@ -1,5 +1,5 @@
 import {BindingKey} from '@loopback/core';
-import {ClassMixinDecoratorInfo} from '../../helpers';
+import {ClassMixinDecoratorOptions} from '../../helpers';
 import {GetFileName} from './providers';
 import {
   StorageProvider,
@@ -19,7 +19,7 @@ export namespace StorageBindings {
 
   export const NAME_PROVIDER = BindingKey.create<GetFileName>('storage.name');
 
-  export const REST_DECORATORS = BindingKey.create<ClassMixinDecoratorInfo>(
+  export const REST_DECORATORS = BindingKey.create<ClassMixinDecoratorOptions>(
     'storage.decorator',
   );
 }
