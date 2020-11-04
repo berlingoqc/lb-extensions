@@ -11,7 +11,6 @@ import {
   FilterExcludingWhere,
   Class,
   Repository,
-  repository,
 } from '@loopback/repository';
 import {
   del,
@@ -28,10 +27,10 @@ import {
 import {
   chain,
   ControllerMixinOptions,
-  getDecoratorsPropertie,
+  getDecoratorsProperties,
 } from '../../../helpers';
 
-// ModelDef : définition d'une model qui peux être exposer
+// ModelDef : définition d'une model qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;
 
 // Optons pour un CrudControllerMixin
@@ -44,7 +43,7 @@ export interface CrudControllerMixinOptions extends ControllerMixinOptions {
   // type de l'identifant
   // par default number
   idType?: string;
-  // si le ID est générer automatiquement
+  // si le ID est généré automatiquement
   // par default omitId est a true
   omitId?: boolean;
 }
@@ -66,7 +65,7 @@ export function disable() {
  */
 export const addCRUDController = <E extends Entity, ID>(
   app: RestApplication,
-  // classe de l'Entityé
+  // classe de l'Entité
   modelDef: ModelDef,
   // paramètre pour l'injection du repository avec @repository()
   repo: string | Class<Repository<Model>> | DefaultCrudRepository<E, ID, {}>,
@@ -162,7 +161,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async create(
       @requestBody({
         content: {
@@ -187,7 +186,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async count(@param.where(repoEntity) where?: Where<E>): Promise<Count> {
       return this.repository.count(where);
     }
@@ -207,7 +206,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async find(@param.filter(repoEntity) filter?: Filter<E>): Promise<E[]> {
       return this.repository.find(filter);
     }
@@ -220,7 +219,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async updateAll(
       @requestBody({
         content: {
@@ -247,7 +246,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async findById(
       @parampath() id: ID,
       @param.filter(repoEntity, {exclude: 'where'})
@@ -263,7 +262,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async updateById(
       @param.path.string('id') id: ID,
       @requestBody({
@@ -285,7 +284,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async replaceById(
       @param.path.string('id') id: ID,
       @requestBody() profile: E,
@@ -300,7 +299,7 @@ export function CrudControllerMixin<
         },
       },
     })
-    @chain(...getDecoratorsPropertie(options.properties))
+    @chain(...getDecoratorsProperties(options.properties))
     async deleteById(@param.path.string('id') id: ID): Promise<void> {
       await this.repository.deleteById(id);
     }
