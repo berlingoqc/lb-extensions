@@ -38,7 +38,7 @@ export interface ControllerMixinOptions extends ClassMixinDecoratorOptions {
  * @param properties
  * @param name
  */
-export function getDecoratorsPropertie(
+export function getDecoratorsProperties(
   properties?: DecoratorProperties,
   name?: string,
 ) {

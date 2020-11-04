@@ -19,7 +19,7 @@ export class CustomModel extends Entity {
   @property({
     required: true,
   })
-  autre: string;
+  requis: string;
 
   @property()
   optionel?: string;
@@ -37,6 +37,10 @@ export class CustomModelRepository extends DefaultCrudRepository<
   }
 }
 
+// Model et Repository pour venir tester les points suivants
+// * utilisation d'une id avec nom custom
+// * utilisation d'un number comme id
+// * utilisation d'un id non générer qui doit être fournis
 @model()
 export class NumberModel extends Entity {
   @property({id: true, name: 'identifiant', generated: false})
@@ -80,10 +84,15 @@ describe('Test du CRUD Controller Mixin', () => {
 
   describe('Test du constructeur', () => {
     it('Avec repository invalide', async () => {
-      const bindingKey = addCRUDController(app, CustomModel, 'Ccaa', {
-        name: '',
-        properties: [],
-      });
+      const bindingKey = addCRUDController(
+        app,
+        CustomModel,
+        'UnknowRepository',
+        {
+          name: '',
+          properties: [],
+        },
+      );
 
       await expect(app.get(bindingKey)).to.be.rejected();
     });
@@ -151,14 +160,11 @@ describe('Test du CRUD Controller Mixin', () => {
 
     describe('Create', () => {
       it("Respectant le schéma de l'object 200", async () => {
-        await client.post('/custom').send({autre: 'DSA'}).expect(200);
+        await client.post('/custom').send({requis: 'value'}).expect(200);
       });
 
       it("Propriété qui n'est pas dans le schéma erreur 422", async () => {
-        await client
-          .post('/custom')
-          .send({autred: 'DSA', autre: 'DSA'})
-          .expect(422);
+        await client.post('/custom').send({inexistant: 'value'}).expect(422);
       });
       it('Propriété required manquante retourne erreur 422', async () => {
         await client.post('/custom').send({}).expect(422);
@@ -167,29 +173,32 @@ describe('Test du CRUD Controller Mixin', () => {
 
     describe('Update', () => {
       it("Respectant le schéma et modification d'une entité existante", async () => {
-        const item = await repo.create({autre: 'dsa'});
+        const item = await repo.create({requis: 'value'});
         await client
           .patch('/custom/' + item.id)
-          .send({autre: 'dsa'})
+          .send({requis: 'value'})
           .expect(204);
       });
 
       it('Ne respectant pas le schéma', async () => {
-        const item = await repo.create({autre: 'dsa'});
+        const item = await repo.create({requis: 'value'});
         await client
           .patch('/custom/' + item.id)
-          .send({autred: 'dsa'})
+          .send({inexistant: 'value'})
           .expect(422);
       });
 
       it('Item non existant', async () => {
-        await client.patch('/custom/1a').send({autred: 'dsa'}).expect(422);
+        await client
+          .patch('/custom/1a')
+          .send({inexistant: 'value'})
+          .expect(422);
       });
     });
 
     describe('Delete', () => {
       it('Delete existant', async () => {
-        const item = await repo.create({autre: 'dsa'});
+        const item = await repo.create({requis: 'value'});
 
         await client.del('/custom/' + item.id).expect(204);
       });
@@ -205,7 +214,7 @@ describe('Test du CRUD Controller Mixin', () => {
       });
 
       it('Count', async () => {
-        await repo.createAll([{autre: '1'}, {autre: '2'}]);
+        await repo.createAll([{requis: 'value'}, {requis: 'value'}]);
 
         const req = await client.get('/custom/count').expect(200);
 
