@@ -40,6 +40,10 @@ describe('Email Component', function () {
   describe('Test de email service', () => {
     let service: EmailSenderService;
 
+    // variable utilisé dans les tests
+    const emailTo = 'info@alborea.com';
+    const emailFrom = 'portail@alphard.com';
+
     beforeEach(async () => {
       service = await app.get('services.EmailSenderService');
       sinon.replace(service, 'setupTransport', sinon.fake());
@@ -60,26 +64,29 @@ describe('Email Component', function () {
 
     it("Envoie d'un email simple", async () => {
       const sendData = await service.sendMail({
-        to: 'info@alborea.com',
-        from: 'portail@alphard.com',
+        to: emailTo,
+        from: emailFrom,
         text: 'Salut a toi',
         html: '<p>Salut a toi</p>',
       });
 
-      expect(sendData.accepted).to.be.eql(['info@alborea.com']);
+      expect(sendData.accepted).to.be.eql([emailTo]);
       expect(sendData.rejected).to.be.empty();
     });
 
     describe('Envoie depuis une avec template', () => {
-      const bodyData = {data: 4};
-      const titleData = {quoi: 'oui'};
+      const bodyData = {body: 4};
+
+      const titleData = {title: 'Bonjour'};
+
       const template = {
-        body: '<p>{{=it.data}}</p>',
-        title: '{{=it.quoi}}',
+        body: '<p>{{=it.body}}</p>',
+        title: '{{=it.title}}',
       };
+
       const templateResolved = {
-        title: 'oui',
-        body: '<p>4</p>',
+        title: titleData.title,
+        body: `<p>${bodyData.body}</p>`,
       };
 
       it('Render simplement une template', async () => {
@@ -92,14 +99,14 @@ describe('Email Component', function () {
       });
       it('Envoie avec une template directement', async () => {
         const sendData = await service.sendMailFromTemplate(
-          'info@alborea.com',
+          emailTo,
           template,
           bodyData,
           titleData,
-          'portail@alphard.com',
+          emailFrom,
         );
 
-        expect(sendData.sendData.accepted).to.be.eql(['info@alborea.com']);
+        expect(sendData.sendData.accepted).to.be.eql([emailTo]);
         expect(sendData.sendData.rejected).to.be.empty();
       });
 
