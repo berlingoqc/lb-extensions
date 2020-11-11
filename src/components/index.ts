@@ -4,3 +4,4 @@ export * from './casbin';
 export * from './auditz';
 export * from './storage';
 export * from './crud';
+export * from './email';

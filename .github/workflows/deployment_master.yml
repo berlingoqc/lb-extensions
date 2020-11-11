@@ -16,7 +16,7 @@ jobs:
           registry-url: 'https://npm.pkg.github.com'
           scope: '@alborea'
       - name: Building app
-        run: npm install && npm run build
+        run: npm ci && npm run build
         env:
           NODE_AUTH_TOKEN: ${{ secrets.READ_PACKAGES_PAT }}
       - name: Running test
