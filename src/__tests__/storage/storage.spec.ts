@@ -1,6 +1,6 @@
 import {expect, supertest} from '@loopback/testlab';
 import {
-  addStorageControler,
+  addStorageController,
   FileMetadata,
   FileStorageService,
   StorageBindings,
@@ -11,7 +11,7 @@ import * as fs from 'fs';
 import {setupApplication, TestApplication} from '../fixtures/app';
 import {join} from 'path';
 
-describe.only('Storage component', () => {
+describe('Storage component', () => {
   let app: TestApplication;
   let client: supertest.SuperTest<supertest.Test>;
 
@@ -24,7 +24,7 @@ describe.only('Storage component', () => {
       },
       async (testapp: TestApplication) => {
         testapp.component(StorageComponent);
-        addStorageControler(testapp, {properties: []});
+        addStorageController(testapp, {properties: []});
       },
     ));
   });
@@ -42,7 +42,6 @@ describe.only('Storage component', () => {
     before(async () => {
       path = fs.mkdtempSync('test');
 
-      console.log(path);
       app.bind(StorageBindings.STORAGE_PROVIDER).toClass(FileStorageService);
       app.bind(StorageBindings.STORAGE_OPTIONS).to({
         destination: path,

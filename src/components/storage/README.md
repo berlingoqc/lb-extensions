@@ -9,12 +9,35 @@ This is a port of the original loopback3 storage component designed to work with
 - Remplacer Container Model par un service
   - Utiliser un binding pour l'implémentation utilisé
   - Bindings pour un provider pour modifier les noms de fichiers
-- Remplacer le controller
-- Component
+- Remplacer le controller fournis par lb3 par un nouveau controller lb4
+- Fournis un component loobpack4
 
 - Fonctionnalités suivantes:
   - Middleware pour faire des transformations sur les fichiers downloader et uploader seulement plusieurs conditions comme type de fichier et autre.
   - Ajouter des metadata supplémentaire dans sur les fichiers uploader dans une table de la base de donnée pour savoir des trucs comme owner et etc ...
+
+## Utilisation
+
+Pour utiliser la component:
+
+```typescript
+...
+import { StorageComponent, StorageBindings, FileStorageService, addStorageController } from '@alborea/loopback-sso-extensions';
+...
+export class MyApplication extends RestApplication(...) {
+  constructor() {
+    // Ajoute la component qui fournis le service StorageService
+    this.component(StorageComponent);
+
+    this.bind(StorageBindings.STORAGE_PROVIDER).toClass(FileStorageService);
+    this.bind(StorageBindings.STORAGE_OPTIONS).to({destination: '...'})
+
+    // Optionel pour venir ajouter le controller avec la deuxièmes
+    // propriétés vous pouvez ajouter des décorateurs au api.
+    addStorageController(this, {properties: []})
+  }
+}
+```
 
 # Containers and files
 

@@ -19,7 +19,7 @@ import {ContainerMetadata} from '../providers';
 import {StorageService} from '../services';
 
 // add a storageController to your application
-export const addStorageControler = (
+export const addStorageController = (
   app: RestApplication,
   config?: ClassMixinDecoratorOptions,
 ) => {
