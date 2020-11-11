@@ -4,15 +4,15 @@ The LoopBack storage component makes it easy to upload and download files to clo
 
 # Porting
 
-This is a port of the origin loopback3 design to work with loopback4.
+This is a port of the original loopback3 storage component designed to work with loopback4.
 
-- Remplacer Container Model Model par un service
-  - Utilisé un bindings pour l'implémentation utilisé
-  - Bindings pour un provider pour modifié les noms de fichiers
+- Remplacer Container Model par un service
+  - Utiliser un binding pour l'implémentation utilisé
+  - Bindings pour un provider pour modifier les noms de fichiers
 - Remplacer le controller
 - Component
 
-- Fonctionnalité suivantes:
+- Fonctionnalités suivantes:
   - Middleware pour faire des transformations sur les fichiers downloader et uploader seulement plusieurs conditions comme type de fichier et autre.
   - Ajouter des metadata supplémentaire dans sur les fichiers uploader dans une table de la base de donnée pour savoir des trucs comme owner et etc ...
 
