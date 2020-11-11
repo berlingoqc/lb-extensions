@@ -12,10 +12,6 @@ This is a port of the original loopback3 storage component designed to work with
 - Remplacer le controller fournis par lb3 par un nouveau controller lb4
 - Fournis un component loobpack4
 
-- Fonctionnalités suivantes:
-  - Middleware pour faire des transformations sur les fichiers downloader et uploader seulement plusieurs conditions comme type de fichier et autre.
-  - Ajouter des metadata supplémentaire dans sur les fichiers uploader dans une table de la base de donnée pour savoir des trucs comme owner et etc ...
-
 ## Utilisation
 
 Pour utiliser la component:
