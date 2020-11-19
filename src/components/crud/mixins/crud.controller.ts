@@ -29,12 +29,17 @@ import {
   ControllerMixinOptions,
   getDecoratorsProperties,
 } from '../../../helpers';
+import {parampathFunction} from './utility';
 
 // ModelDef : définition d'une model qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;
 
-// Optons pour un CrudControllerMixin
-export interface CrudControllerMixinOptions extends ControllerMixinOptions {
+export type InjectableRepository<E extends Entity, ID> =
+  | string
+  | Class<Repository<Model>>
+  | DefaultCrudRepository<E, ID, {}>;
+
+export interface CrudMixinOptions {
   // nom de la ressource pour le path {basepath}/{name}
   name: string;
   // nom de la variable qui correspond a l'identifiant de l'entité
@@ -47,6 +52,11 @@ export interface CrudControllerMixinOptions extends ControllerMixinOptions {
   // par default omitId est a true
   omitId?: boolean;
 }
+
+// Optons pour un CrudControllerMixin
+export interface CrudControllerMixinOptions
+  extends ControllerMixinOptions,
+    CrudMixinOptions {}
 
 // Decorator to add to an operation that
 // you don't wont to be enable
@@ -68,7 +78,7 @@ export const addCRUDController = <E extends Entity, ID>(
   // classe de l'Entité
   modelDef: ModelDef,
   // paramètre pour l'injection du repository avec @repository()
-  repo: string | Class<Repository<Model>> | DefaultCrudRepository<E, ID, {}>,
+  repo: InjectableRepository<E, ID>,
   options: CrudControllerMixinOptions,
 ) => {
   const name =
@@ -99,8 +109,9 @@ export const addCRUDController = <E extends Entity, ID>(
     }
   }
 
-  const bindings = app.controller(Test);
-  return bindings.key;
+  const binding = app.controller(Test, `${options.name}Controller`);
+
+  return binding.key;
 };
 
 /**
@@ -134,20 +145,7 @@ export function CrudControllerMixin<
     options.omitId === undefined || options.omitId === true ? [options.id] : [];
 
   // wrap to use to correct property decorator to get id from request
-  function parampath() {
-    return (target: object, member: string, index: number) => {
-      switch (options.idType) {
-        case 'string':
-          return param.path.string(options.id as string)(target, member, index);
-        case 'number':
-          return param.path.number(options.id as string)(target, member, index);
-        default:
-          throw new HttpErrors.UnprocessableEntity(
-            'ID must be string or number',
-          );
-      }
-    };
-  }
+  const parampath = parampathFunction(options);
   class RestController extends superClass {
     repository: DefaultCrudRepository<E, ID, {}>;
 
