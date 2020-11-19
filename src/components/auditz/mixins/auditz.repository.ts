@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {Getter, MixinTarget} from '@loopback/core';
+import {Constructor, Getter, MixinTarget} from '@loopback/core';
 import {
   Entity,
   DefaultCrudRepository,
@@ -79,7 +79,9 @@ function modifyWhereForRequest(where: any): Where {
 export function AuditzRepositoryMixin<
   T extends Entity & AuditzModel<ID>,
   ID,
-  R extends MixinTarget<EntityCrudRepository<T, ID, {}>>
+  R extends MixinTarget<EntityCrudRepository<T, ID, {}>> = Constructor<
+    DefaultCrudRepository<T, ID, {}>
+  >
 >(superClass: R, settings: AuditzRepositorySettings = {}) {
   const softDelete =
     settings.softDeleted == null ||
