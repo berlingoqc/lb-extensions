@@ -34,6 +34,8 @@ import {parampathFunction} from './utility';
 // ModelDef : définition d'une model qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;
 
+// InjectableRepository est une union des types qui peuvent
+// être utilisé pour l'obtention d'une repository
 export type InjectableRepository<E extends Entity, ID> =
   | string
   | Class<Repository<Model>>

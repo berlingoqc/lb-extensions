@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   Entity,
   Model,
@@ -6,11 +7,13 @@ import {
 } from '@loopback/repository';
 
 /**
+ * Utilitaire pour générer des controllers pour exposer les
+ * relations d'une Entity avec les opérations suivantes
  * /{model}/{id}/{relation}/{fk}
  *
  * GET
  * POST
- * GET
+ * GET (by id)
  * PUT
  * DELETE
  */
@@ -25,11 +28,16 @@ import {
 import {get, post, put, del, param, RestApplication} from '@loopback/rest';
 import {parampathFunction} from './utility';
 
+// Définition de la relation d'un model a exposer
 export interface ModelRelation {
+  // Définition du Model
   modelRelationDef: ModelDef;
+  // Options pour le controller
   optionsRelation: CrudMixinOptions;
 }
 
+// Permet d'ajouter directement un CrudRelationController anonyme
+// dans votre application
 export const addCrudRelationController = <
   E extends Entity,
   ID,
@@ -80,6 +88,19 @@ export const addCrudRelationController = <
   return bindings.key;
 };
 
+// Mixin pour l'ajout des handlers pour les requêtes d'une relation
+// d'un modèle avec les accessor de relations dans le repository
+// du model parent.
+// Pour l'utiliser sur votre relation vous devez déclarer vos accessor
+// dans votre repository. Peux être fait avec la commande `lb4 relation`
+/**
+ *
+ * @param superClass
+ * @param repoEntity
+ * @param repoEntityRelation
+ * @param options
+ * @param optionsRelation
+ */
 export function CrudRelationControllerMixin<
   T extends MixinTarget<object>,
   ES extends Entity,
@@ -104,19 +125,6 @@ export function CrudRelationControllerMixin<
 
   class CrudRelationController extends superClass {
     repository: DefaultCrudRepository<any, any, {}> & any;
-
-    /*constructor(...items: any[]) {
-      super(items);
-      console.log('VALIDATING ME');
-      // valide que la relation existe dans le repository
-      const funcRelation = this.repository[optionsRelation.name];
-      if (!funcRelation || typeof funcRelation === 'function') {
-        throw new Error(
-          `Relation ${optionsRelation.name} n'existe pas dans le repository`,
-        );
-      }
-    }
-    */
 
     @get(`${basePath}`)
     async getRelationModel(
