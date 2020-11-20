@@ -147,7 +147,7 @@ export function CrudControllerMixin<
     options.omitId === undefined || options.omitId === true ? [options.id] : [];
 
   // wrap to use to correct property decorator to get id from request
-  const parampath = parampathFunction(options);
+  const parampath = parampathFunction(options.idType, options.id);
   class RestController extends superClass {
     repository: DefaultCrudRepository<E, ID, {}>;
 

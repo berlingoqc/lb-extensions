@@ -1,14 +1,13 @@
-import {CrudControllerMixinOptions} from './crud.controller';
 import {param, HttpErrors} from '@loopback/rest';
 
-export function parampathFunction(options: CrudControllerMixinOptions) {
+export function parampathFunction(idType: string, idName = 'id') {
   return () => {
     return (target: object, member: string, index: number) => {
-      switch (options.idType) {
+      switch (idType) {
         case 'string':
-          return param.path.string(options.id as string)(target, member, index);
+          return param.path.string(idName)(target, member, index);
         case 'number':
-          return param.path.number(options.id as string)(target, member, index);
+          return param.path.number(idName)(target, member, index);
         default:
           throw new HttpErrors.UnprocessableEntity(
             'ID must be string or number',
