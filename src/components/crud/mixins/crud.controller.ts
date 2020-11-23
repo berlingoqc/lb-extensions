@@ -13,13 +13,8 @@ import {
   Repository,
 } from '@loopback/repository';
 import {
-  del,
-  get,
   getModelSchemaRef,
   param,
-  patch,
-  post,
-  put,
   requestBody,
   RestApplication,
 } from '@loopback/rest';
@@ -41,7 +36,8 @@ export type CrudOperators =
   | 'findById'
   | 'updateAll'
   | 'count'
-  | 'create';
+  | 'create'
+  | string;
 
 // ModelDef : définition d'une model qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;

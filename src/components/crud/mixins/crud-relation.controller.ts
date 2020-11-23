@@ -26,16 +26,22 @@ import {
   ModelDef,
 } from './crud.controller';
 import {param, RestApplication, HttpErrors} from '@loopback/rest';
-import {chain, DecoratorInfo, getDecoratorsProperties} from '../../../helpers';
+import {chain, getDecoratorsProperties} from '../../../helpers';
 import {
-  disable,
   parampathFunction,
   requestBodyDecoratorGetter,
   operatorDecorator,
 } from './decorator';
 
-export type AccessorType = 'BelongTo' | 'HasMany' | 'HasOne';
+// Les différents types Accessor de relation qui sont disponible pour CrudRelationController
+export type AccessorType = 'BelongsTo' | 'HasMany' | 'HasOne';
 
+// Fonction pour identifié si l'object est de que'elle AccessorType
+// La méthode est rudimentaire parce que je ne trouvais pas de meilleur
+// facon pour tester que l'object item implémente l'interface alors
+// je vais faire un toString de l'item qui me donne le code source
+// que je parse pour voire de quelle classe il s'agit.
+// Fonctionne et simple mais il faudrait mieux que ça
 export function identityAccessorType(item: any): AccessorType {
   const str = item.toString();
   if (str) {
@@ -44,7 +50,7 @@ export function identityAccessorType(item: any): AccessorType {
     } else if (str.includes('HasOne')) {
       return 'HasOne';
     } else if (str.includes('BelongsTo')) {
-      return 'BelongTo';
+      return 'BelongsTo';
     }
   }
   throw new HttpErrors.BadRequest(
@@ -114,12 +120,21 @@ export const addCrudRelationController = <
   return bindings.key;
 };
 
-// Mixin pour l'ajout des handlers pour les requêtes d'une relation
-// d'un modèle avec les accessor de relations dans le repository
-// du model parent.
-// Pour l'utiliser sur votre relation vous devez déclarer vos accessor
-// dans votre repository. Peux être fait avec la commande `lb4 relation`
 /**
+ * Mixin pour l'ajout des handlers pour les requêtes d'une relation
+ * d'un modèle avec les accessor de relations dans le repository
+ * du model parent.
+ * Pour l'utiliser sur votre relation vous devez déclarer vos accessor
+ * dans votre repository. Peux être fait avec la commande `lb4 relation`
+ *
+ * Pour une relation BelongsTo les api suivants sont innaccessible:
+ *  * create
+ *  * getById
+ *  * update
+ *  * delete
+ *
+ * Pour une relation HaveOne les api suivants sont innaccessible:
+ *  * getById
  *
  * @param superClass
  * @param repoEntity
@@ -144,10 +159,22 @@ export function CrudRelationControllerMixin<
     optionsRelation.name
   }`;
 
+  // Par default configurer le id et le type de id
   if (!options.id) options.id = 'id';
   if (!options.idType) options.idType = 'number';
 
-  const disableDecInfo: DecoratorInfo = {func: disable, args: []};
+  if (!optionsRelation.id) optionsRelation.id = 'id';
+  if (!optionsRelation.idType) optionsRelation.idType = 'number';
+
+  // Map pour les API qui sont disables
+  let disableApiMap: {[id: string]: boolean} = {};
+  const isDisable = (call: string) => {
+    // regarde si desactiver dans la map
+    if (disableApiMap[call]) return true;
+    // regarde si desactiver pour le user
+    if (options.disables && options.disables.indexOf(call) > -1) return true;
+    return false;
+  };
 
   const omitId =
     optionsRelation.omitId === undefined || options.omitId === true
@@ -157,8 +184,6 @@ export function CrudRelationControllerMixin<
   const parampath = parampathFunction(options.idType, 'id');
   const parampathrelation = parampathFunction(options.idType, 'fk');
   const requestbody = requestBodyDecoratorGetter(repoEntityRelation);
-
-  let decoratorsProperty: {[id: string]: DecoratorInfo[]} = {};
 
   let accessorString: AccessorType;
 
@@ -178,19 +203,19 @@ export function CrudRelationControllerMixin<
       // bons callback
       accessorString = identityAccessorType(relationAccessor);
       switch (accessorString) {
-        case 'BelongTo':
+        case 'BelongsTo':
           findData = (id: any) => this.getRelationThings(id);
-          decoratorsProperty = {
-            create: [disableDecInfo],
-            get: [disableDecInfo],
-            update: [disableDecInfo],
-            delete: [disableDecInfo],
+          disableApiMap = {
+            create: true,
+            get: true,
+            update: true,
+            delete: true,
           };
           break;
         case 'HasOne':
           findData = (id: any) => this.getRelationThings(id).get();
-          decoratorsProperty = {
-            get: [disableDecInfo],
+          disableApiMap = {
+            get: true,
           };
           break;
         case 'HasMany':
@@ -205,6 +230,7 @@ export function CrudRelationControllerMixin<
       path: basePath,
       name: repoEntity.name,
       model: repoEntityRelation,
+      disable: isDisable('find'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async findRelationModel(
@@ -219,8 +245,8 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
+      disable: isDisable('get'),
     })
-    @chain(...(decoratorsProperty['get'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async getRelationModel(
       @parampath() id: any,
@@ -242,8 +268,8 @@ export function CrudRelationControllerMixin<
       path: basePath,
       name: repoEntity.name,
       model: repoEntityRelation,
+      disable: isDisable('create'),
     })
-    @chain(...(decoratorsProperty['create'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async createRelationModel(
       @parampath() id: any,
@@ -258,8 +284,8 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
+      disable: isDisable('update'),
     })
-    @chain(...(decoratorsProperty['update'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async putRelationModelById(
       @parampath() id: any,
@@ -276,8 +302,8 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
+      disable: isDisable('delete'),
     })
-    @chain(...(decoratorsProperty['delete'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async delRelationModel(@parampath() id: any, @parampathrelation() fk: any) {
       return this.getRelationThings(id).delete({
