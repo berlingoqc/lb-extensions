@@ -137,8 +137,6 @@ describe.only('Test CrudRelationController', () => {
     await app.stop();
   });
 
-  it('Love me', () => {});
-
   describe('Test CRUD Relation par REST', () => {
     let customModelRepo: CustomModelRepository;
     let oneModelRepo: OneModelRepository;

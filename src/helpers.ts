@@ -19,7 +19,7 @@ export type DecoratorProperties =
  * Options de base pour des Mixins qui target une classe
  */
 export interface ClassMixinDecoratorOptions {
-  properties: DecoratorProperties;
+  properties?: DecoratorProperties;
 }
 
 /**

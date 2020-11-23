@@ -9,8 +9,6 @@ import {
   Where,
   Filter,
   FilterExcludingWhere,
-  Class,
-  Repository,
 } from '@loopback/repository';
 import {
   getModelSchemaRef,
@@ -18,57 +16,18 @@ import {
   requestBody,
   RestApplication,
 } from '@loopback/rest';
-import {
-  chain,
-  ControllerMixinOptions,
-  getDecoratorsProperties,
-} from '../../../helpers';
+import {chain, getDecoratorsProperties} from '../../../helpers';
 import {
   operatorDecorator,
   parampathFunction,
   requestBodyDecoratorGetter,
 } from './decorator';
-
-export type CrudOperators =
-  | 'deleteById'
-  | 'replaceById'
-  | 'updateById'
-  | 'findById'
-  | 'updateAll'
-  | 'count'
-  | 'create'
-  | string;
-
-// ModelDef : définition d'une model qui peut être exposé
-export type ModelDef = Function & {prototype: any} & typeof Model;
-
-// InjectableRepository est une union des types qui peuvent
-// être utilisé pour l'obtention d'une repository
-export type InjectableRepository<E extends Entity, ID> =
-  | string
-  | Class<Repository<Model>>
-  | DefaultCrudRepository<E, ID, {}>;
-
-export interface CrudMixinOptions {
-  // nom de la ressource pour le path {basepath}/{name}
-  name: string;
-  // nom de la variable qui correspond a l'identifiant de l'entité
-  // par default ID
-  id?: string;
-  // type de l'identifant
-  // par default number
-  idType?: string;
-  // si le ID est généré automatiquement
-  // par default omitId est a true
-  omitId?: boolean;
-}
-
-// Optons pour un CrudControllerMixin
-export interface CrudControllerMixinOptions
-  extends ControllerMixinOptions,
-    CrudMixinOptions {
-  disables?: CrudOperators[];
-}
+import {
+  CrudControllerMixinOptions,
+  CrudOperators,
+  InjectableRepository,
+  ModelDef,
+} from './model';
 
 /**
  * Ajoute un CRUD Controller anonyme à partir d'un model qui possède un repository
@@ -144,10 +103,8 @@ export function CrudControllerMixin<
   const omitId =
     options.omitId === undefined || options.omitId === true ? [options.id] : [];
 
-  const isDisable = (funcName: string) =>
-    options.disables
-      ? options.disables.indexOf(funcName as CrudOperators) > -1
-      : false;
+  const isDisable = (funcName: CrudOperators) =>
+    options.disables ? options.disables.indexOf(funcName) > -1 : false;
 
   // wrap to use to correct property decorator to get id from request
   const parampath = parampathFunction(options.idType, options.id);
@@ -216,7 +173,7 @@ export function CrudControllerMixin<
 
     @operatorDecorator({
       op: 'GET',
-      path: `${basePath}/id`,
+      path: `${basePath}/{id}`,
       name: repoEntity.name,
       customSchema: getModelSchemaRef(repoEntity, {includeRelations: true}),
       disable: isDisable('findById'),
@@ -232,7 +189,7 @@ export function CrudControllerMixin<
 
     @operatorDecorator({
       op: 'PATCH',
-      path: `${basePath}/id`,
+      path: `${basePath}/{id}`,
       name: repoEntity.name,
       customSchema: {},
       responseDescription: 'Entity PATCH success',
@@ -241,13 +198,7 @@ export function CrudControllerMixin<
     @chain(...getDecoratorsProperties(options.properties))
     async updateById(
       @param.path.string('id') id: ID,
-      @requestBody({
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(repoEntity, {partial: true}),
-          },
-        },
-      })
+      @requestbody({partial: true, exclude: omitId})
       profile: E,
     ): Promise<void> {
       await this.repository.updateById(id, profile);
@@ -255,7 +206,7 @@ export function CrudControllerMixin<
 
     @operatorDecorator({
       op: 'PUT',
-      path: `${basePath}/id`,
+      path: `${basePath}/{id}`,
       name: repoEntity.name,
       model: repoEntity,
       disable: isDisable('replaceById'),
@@ -270,7 +221,7 @@ export function CrudControllerMixin<
 
     @operatorDecorator({
       op: 'DELETE',
-      path: `${basePath}/id`,
+      path: `${basePath}/{id}`,
       name: repoEntity.name,
       responseDescription: 'DELETE success',
       disable: isDisable('deleteById'),

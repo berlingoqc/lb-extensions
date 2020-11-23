@@ -7,6 +7,93 @@ Le but est de réduire le boilerplate code qui doit etre ajouté dans
 les controllers pour exposer le repository. Et dans le plus part des cas
 nous n'avons pas à les modifiés seulement à ajoutés des décorateurs.
 
+## Exposition de model et relations en une étape
+
+Vous pouvez dynamiquement ajouté un controlleur pour un model avec les
+relations de façon anonyme. Cette méthode est favoriser et si vous
+désirez ajouté d'autre fonctionne faite un autre controller qui sert
+le même endpoint. C'est plus simple et demande moins de boilerplate et
+de configuration.
+
+Pour le détails sur la configuration voire les commentaires [ici](mixins/crud.controller.ts)
+
+```typescript
+import { addCRUDModelsControllerWithRelations  } from '@alborea/loopback-sso-extensions';
+....
+
+const MODELS: CrudModelWithRelationss = [
+  {
+    model: MonModel,
+    repo: MonModelRepository,
+    options: {
+      names: 'profiles,
+    },
+    relations: [
+      {
+        modelRelationDef: RelationDeMonModel,
+        optionsRelations: {
+          name: 'relations'
+        }
+      }
+    ]
+  }
+];
+
+export class MonApplication extends BootMixin(
+  ServiceMixin(RepositoryMixin(RestApplication)){
+
+    models = [];
+
+    constructor(options: ApplicationConfig = {}) {
+      super(options);
+
+
+      addCRUDModelsControllerWithRelations(
+        this,
+        MODELS,
+      );
+    }
+  },
+) {
+
+```
+
+## List des API générés
+
+Voici une description rapides des fonctions qui sont ajoutés
+par le mixin.
+
+### CRUDModel
+
+La racine de l'api est le nom spécifié
+
+| Name        | OP     | PATH   |
+| ----------- | ------ | ------ |
+| create      | POST   | /      |
+| count       | GET    | /count |
+| find        | GET    | /      |
+| updateAll   | PATCH  | /      |
+| findById    | GET    | /{id}  |
+| updateById  | PATCH  | /{id}  |
+| replaceById | PUT    | /{id}  |
+| deleteById  | DELETE | /{id}  |
+
+### CRUDRelationModel
+
+La racine de l'api est le nom spécifié pour le model parent
+l'id de l'item.
+
+ex: /parent/1/...
+
+
+| Name       | OP   | PATH  | AccessorType               |
+| ---------- | ---- | ----- | -------------------------- |
+| find       | GET  | /     | HasMany, HasOne, BelongsTo |
+| create     | POST | /     | HasMany, HasOne            |
+| get        | GET  | /{id} | HasMany                    |
+| updateById | GET  | /{id} | HasMany, HasOne            |
+| deleteById | GET  | /{id} | HasMany, HasOne            |
+
 ## Crud Controller Mixin
 
 Définitions de [CrudControllerMixinOptions](mixins/crud.controller.ts)

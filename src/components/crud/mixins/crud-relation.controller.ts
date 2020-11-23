@@ -6,25 +6,7 @@ import {
   Filter,
 } from '@loopback/repository';
 
-/**
- * Utilitaire pour générer des controllers pour exposer les
- * relations d'une Entity avec les opérations suivantes
- * /{model}/{id}/{relation}/{fk}
- *
- * GET
- * POST
- * GET (by id)
- * PUT
- * DELETE
- */
-
 import {Constructor, inject, MixinTarget} from '@loopback/core';
-import {
-  CrudControllerMixinOptions,
-  CrudMixinOptions,
-  InjectableRepository,
-  ModelDef,
-} from './crud.controller';
 import {param, RestApplication, HttpErrors} from '@loopback/rest';
 import {chain, getDecoratorsProperties} from '../../../helpers';
 import {
@@ -32,6 +14,12 @@ import {
   requestBodyDecoratorGetter,
   operatorDecorator,
 } from './decorator';
+import {
+  CrudControllerMixinOptions,
+  CrudOperators,
+  InjectableRepository,
+  ModelDef,
+} from './model';
 
 // Les différents types Accessor de relation qui sont disponible pour CrudRelationController
 export type AccessorType = 'BelongsTo' | 'HasMany' | 'HasOne';
@@ -58,14 +46,6 @@ export function identityAccessorType(item: any): AccessorType {
   );
 }
 
-// Définition de la relation d'un model a exposer
-export interface ModelRelation {
-  // Définition du Model
-  modelRelationDef: ModelDef;
-  // Options pour le controller
-  optionsRelation: CrudMixinOptions;
-}
-
 // Permet d'ajouter directement un CrudRelationController anonyme
 // dans votre application
 export const addCrudRelationController = <
@@ -79,7 +59,7 @@ export const addCrudRelationController = <
   modelRelationRef: ModelDef,
   repo: InjectableRepository<E, ID>,
   options: CrudControllerMixinOptions,
-  optionsRelation: CrudMixinOptions,
+  optionsRelation: CrudControllerMixinOptions,
 ) => {
   const name =
     typeof repo === 'string'
@@ -153,26 +133,29 @@ export function CrudRelationControllerMixin<
   repoEntity: Function & {prototype: any} & typeof Model,
   repoEntityRelation: Function & {prototype: any} & typeof Model,
   options: CrudControllerMixinOptions,
-  optionsRelation: CrudMixinOptions,
+  optionsRelation: CrudControllerMixinOptions,
 ) {
   const basePath = `${options.basePath ?? ''}/${options.name}/{id}/${
     optionsRelation.name
   }`;
 
+  if (!options.properties) options.properties = [];
   // Par default configurer le id et le type de id
   if (!options.id) options.id = 'id';
   if (!options.idType) options.idType = 'number';
 
   if (!optionsRelation.id) optionsRelation.id = 'id';
   if (!optionsRelation.idType) optionsRelation.idType = 'number';
+  if (!optionsRelation.properties) optionsRelation.properties = [];
 
   // Map pour les API qui sont disables
   let disableApiMap: {[id: string]: boolean} = {};
-  const isDisable = (call: string) => {
+  const isDisable = (call: CrudOperators) => {
     // regarde si desactiver dans la map
     if (disableApiMap[call]) return true;
     // regarde si desactiver pour le user
-    if (options.disables && options.disables.indexOf(call) > -1) return true;
+    if (optionsRelation.disables && optionsRelation.disables.indexOf(call) > -1)
+      return true;
     return false;
   };
 
@@ -207,15 +190,15 @@ export function CrudRelationControllerMixin<
           findData = (id: any) => this.getRelationThings(id);
           disableApiMap = {
             create: true,
-            get: true,
-            update: true,
-            delete: true,
+            findById: true,
+            updateById: true,
+            deleteById: true,
           };
           break;
         case 'HasOne':
           findData = (id: any) => this.getRelationThings(id).get();
           disableApiMap = {
-            get: true,
+            findById: true,
           };
           break;
         case 'HasMany':
@@ -234,7 +217,7 @@ export function CrudRelationControllerMixin<
     })
     @chain(...getDecoratorsProperties(options.properties))
     async findRelationModel(
-      @parampath() id: any,
+      @parampath() id: IDS,
       @param.query.object('filter') filter?: Filter<ER>,
     ) {
       return findData(id, filter);
@@ -245,21 +228,24 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('get'),
+      disable: isDisable('findById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async getRelationModel(
-      @parampath() id: any,
-      @parampathrelation() fk: any,
+      @parampath() id: IDS,
+      @parampathrelation() fk: IDR,
       @param.query.object('filter') filter: Filter<ER> = {},
     ) {
       const filterCertified = Object.assign(filter, {
         where: {[optionsRelation.name]: fk},
       });
       const items = await this.getRelationThings(id).find(filterCertified);
-      if (items.length !== 1) {
-        throw new HttpErrors.NotFound('Not found boyy');
+      if (items.length < 1) {
+        throw new HttpErrors.NotFound('Item not found');
+      } else if (items.length > 1) {
+        throw new HttpErrors.InternalServerError('To mutch item returned');
       }
+
       return items[0];
     }
 
@@ -272,7 +258,7 @@ export function CrudRelationControllerMixin<
     })
     @chain(...getDecoratorsProperties(options.properties))
     async createRelationModel(
-      @parampath() id: any,
+      @parampath() id: IDS,
       @requestbody({partial: true, exclude: omitId})
       body: Partial<ER>,
     ) {
@@ -284,12 +270,12 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('update'),
+      disable: isDisable('updateById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async putRelationModelById(
-      @parampath() id: any,
-      @parampathrelation() fk: any,
+      @parampath() id: IDS,
+      @parampathrelation() fk: IDR,
       @requestbody() body: Partial<ER>,
     ) {
       return this.getRelationThings(id).patch(body, {
@@ -302,10 +288,10 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('delete'),
+      disable: isDisable('deleteById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
-    async delRelationModel(@parampath() id: any, @parampathrelation() fk: any) {
+    async delRelationModel(@parampath() id: IDS, @parampathrelation() fk: IDR) {
       return this.getRelationThings(id).delete({
         [optionsRelation.id as string | number]: fk,
       });

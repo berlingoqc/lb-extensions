@@ -6,7 +6,12 @@ import {
   getModelSchemaRef,
   operation,
 } from '@loopback/rest';
-import {ModelDef} from './crud.controller';
+import {ModelDef} from './model';
+
+/**
+ * Contient des decorateur et des functions qui génères
+ * des décorateur pour simplifier les decorateur de @loopback/rest
+ */
 
 const defaultResponseDescription = {
   POST: (name: string) => ``,
