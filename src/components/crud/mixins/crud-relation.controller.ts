@@ -237,7 +237,7 @@ export function CrudRelationControllerMixin<
       @param.query.object('filter') filter: Filter<ER> = {},
     ) {
       const filterCertified = Object.assign(filter, {
-        where: {[optionsRelation.name]: fk},
+        where: {[optionsRelation.id + '']: fk},
       });
       const items = await this.getRelationThings(id).find(filterCertified);
       if (items.length < 1) {
@@ -276,11 +276,12 @@ export function CrudRelationControllerMixin<
     async putRelationModelById(
       @parampath() id: IDS,
       @parampathrelation() fk: IDR,
-      @requestbody() body: Partial<ER>,
+      @requestbody({partial: true}) body: Partial<ER>,
     ) {
-      return this.getRelationThings(id).patch(body, {
+      await this.getRelationThings(id).patch(body, {
         [optionsRelation.id as string | number]: fk,
       });
+      return;
     }
 
     @operatorDecorator({
@@ -292,9 +293,10 @@ export function CrudRelationControllerMixin<
     })
     @chain(...getDecoratorsProperties(options.properties))
     async delRelationModel(@parampath() id: IDS, @parampathrelation() fk: IDR) {
-      return this.getRelationThings(id).delete({
+      await this.getRelationThings(id).delete({
         [optionsRelation.id as string | number]: fk,
       });
+      return;
     }
 
     getRelationThings(id: any) {
