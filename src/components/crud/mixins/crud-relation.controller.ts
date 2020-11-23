@@ -22,23 +22,17 @@ import {Constructor, inject, MixinTarget} from '@loopback/core';
 import {
   CrudControllerMixinOptions,
   CrudMixinOptions,
-  disable,
   InjectableRepository,
   ModelDef,
 } from './crud.controller';
-import {
-  get,
-  post,
-  put,
-  del,
-  param,
-  RestApplication,
-  HttpErrors,
-  requestBody,
-  getModelSchemaRef,
-} from '@loopback/rest';
-import {parampathFunction} from './utility';
+import {param, RestApplication, HttpErrors} from '@loopback/rest';
 import {chain, DecoratorInfo, getDecoratorsProperties} from '../../../helpers';
+import {
+  disable,
+  parampathFunction,
+  requestBodyDecoratorGetter,
+  operatorDecorator,
+} from './decorator';
 
 export type AccessorType = 'BelongTo' | 'HasMany' | 'HasOne';
 
@@ -155,8 +149,14 @@ export function CrudRelationControllerMixin<
 
   const disableDecInfo: DecoratorInfo = {func: disable, args: []};
 
+  const omitId =
+    optionsRelation.omitId === undefined || options.omitId === true
+      ? [optionsRelation.id as string]
+      : [];
+
   const parampath = parampathFunction(options.idType, 'id');
   const parampathrelation = parampathFunction(options.idType, 'fk');
+  const requestbody = requestBodyDecoratorGetter(repoEntityRelation);
 
   let decoratorsProperty: {[id: string]: DecoratorInfo[]} = {};
 
@@ -200,7 +200,12 @@ export function CrudRelationControllerMixin<
       }
     }
 
-    @get(`${basePath}`)
+    @operatorDecorator({
+      op: 'GET',
+      path: basePath,
+      name: repoEntity.name,
+      model: repoEntityRelation,
+    })
     @chain(...getDecoratorsProperties(options.properties))
     async findRelationModel(
       @parampath() id: any,
@@ -209,7 +214,12 @@ export function CrudRelationControllerMixin<
       return findData(id, filter);
     }
 
-    @get(`${basePath}/{fk}`)
+    @operatorDecorator({
+      op: 'GET',
+      path: `${basePath}/{fk}`,
+      name: repoEntity.name,
+      model: repoEntityRelation,
+    })
     @chain(...(decoratorsProperty['get'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async getRelationModel(
@@ -227,42 +237,46 @@ export function CrudRelationControllerMixin<
       return items[0];
     }
 
-    @post(`${basePath}`)
+    @operatorDecorator({
+      op: 'POST',
+      path: basePath,
+      name: repoEntity.name,
+      model: repoEntityRelation,
+    })
     @chain(...(decoratorsProperty['create'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async createRelationModel(
       @parampath() id: any,
-      @requestBody({
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(repoEntityRelation, {
-              title: '',
-              exclude: [], // maybe my id if ssoooo
-              optional: [], // relation id
-            }),
-          },
-        },
-      })
+      @requestbody({partial: true, exclude: omitId})
       body: Partial<ER>,
     ) {
       return this.getRelationThings(id).create(body);
     }
 
-    @put(`${basePath}/{fk}`)
+    @operatorDecorator({
+      op: 'PUT',
+      path: `${basePath}/{fk}`,
+      name: repoEntity.name,
+      model: repoEntityRelation,
+    })
     @chain(...(decoratorsProperty['update'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async putRelationModelById(
       @parampath() id: any,
       @parampathrelation() fk: any,
-      @requestBody()
-      body: Partial<ER>,
+      @requestbody() body: Partial<ER>,
     ) {
       return this.getRelationThings(id).patch(body, {
         [optionsRelation.id as string | number]: fk,
       });
     }
 
-    @del(`${basePath}/{fk}`)
+    @operatorDecorator({
+      op: 'DELETE',
+      path: `${basePath}/{fk}`,
+      name: repoEntity.name,
+      model: repoEntityRelation,
+    })
     @chain(...(decoratorsProperty['delete'] ?? []))
     @chain(...getDecoratorsProperties(options.properties))
     async delRelationModel(@parampath() id: any, @parampathrelation() fk: any) {
@@ -272,7 +286,11 @@ export function CrudRelationControllerMixin<
     }
 
     getRelationThings(id: any) {
-      return this.repository[optionsRelation.name](id);
+      const relations = this.repository[optionsRelation.name](id);
+      if (!relations) {
+        throw new HttpErrors.InternalServerError('Relation not loaded ' + id);
+      }
+      return relations;
     }
   }
 

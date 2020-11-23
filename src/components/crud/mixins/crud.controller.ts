@@ -16,7 +16,6 @@ import {
   del,
   get,
   getModelSchemaRef,
-  HttpErrors,
   param,
   patch,
   post,
@@ -29,7 +28,20 @@ import {
   ControllerMixinOptions,
   getDecoratorsProperties,
 } from '../../../helpers';
-import {parampathFunction} from './utility';
+import {
+  operatorDecorator,
+  parampathFunction,
+  requestBodyDecoratorGetter,
+} from './decorator';
+
+export type CrudOperators =
+  | 'deleteById'
+  | 'replaceById'
+  | 'updateById'
+  | 'findById'
+  | 'updateAll'
+  | 'count'
+  | 'create';
 
 // ModelDef : définition d'une model qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;
@@ -58,18 +70,8 @@ export interface CrudMixinOptions {
 // Optons pour un CrudControllerMixin
 export interface CrudControllerMixinOptions
   extends ControllerMixinOptions,
-    CrudMixinOptions {}
-
-// Decorator to add to an operation that
-// you don't wont to be enable
-export function disable() {
-  return (target: any, key: string, descriptor: any) => {
-    descriptor.value = function () {
-      throw new HttpErrors.NotExtended();
-    };
-
-    return descriptor;
-  };
+    CrudMixinOptions {
+  disables?: CrudOperators[];
 }
 
 /**
@@ -146,105 +148,82 @@ export function CrudControllerMixin<
   const omitId =
     options.omitId === undefined || options.omitId === true ? [options.id] : [];
 
+  const isDisable = (funcName: string) =>
+    options.disables
+      ? options.disables.indexOf(funcName as CrudOperators) > -1
+      : false;
+
   // wrap to use to correct property decorator to get id from request
   const parampath = parampathFunction(options.idType, options.id);
+  const requestbody = requestBodyDecoratorGetter(repoEntity);
   class RestController extends superClass {
     repository: DefaultCrudRepository<E, ID, {}>;
 
-    @post(basePath, {
-      responses: {
-        '200': {
-          description: 'Create model instance',
-          content: {
-            'application/json': {schema: getModelSchemaRef(repoEntity)},
-          },
-        },
-      },
+    @operatorDecorator({
+      op: 'POST',
+      path: `${basePath}`,
+      name: repoEntity.name,
+      model: repoEntity,
+      disable: isDisable('create'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async create(
-      @requestBody({
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(repoEntity, {
-              title: 'NewEntity',
-              exclude: omitId,
-            }),
-          },
-        },
-      })
+      @requestbody({exclude: omitId})
       profile: Omit<E, 'id'>,
     ): Promise<E> {
       return this.repository.create(profile as any);
     }
 
-    @get(basePath + '/count', {
-      responses: {
-        '200': {
-          description: 'Profile model count',
-          content: {'application/json': {schema: CountSchema}},
-        },
-      },
+    @operatorDecorator({
+      op: 'GET',
+      path: `${basePath}/count`,
+      name: repoEntity.name,
+      customSchema: CountSchema,
+      disable: isDisable('count'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async count(@param.where(repoEntity) where?: Where<E>): Promise<Count> {
       return this.repository.count(where);
     }
 
-    @get(basePath, {
-      responses: {
-        '200': {
-          description: 'Array of Profile model instances',
-          content: {
-            'application/json': {
-              schema: {
-                type: 'array',
-                items: getModelSchemaRef(repoEntity, {includeRelations: true}),
-              },
-            },
-          },
-        },
+    @operatorDecorator({
+      op: 'GET',
+      path: `${basePath}`,
+      name: repoEntity.name,
+      customSchema: {
+        type: 'array',
+        items: getModelSchemaRef(repoEntity, {includeRelations: true}),
       },
+      disable: isDisable('find'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async find(@param.filter(repoEntity) filter?: Filter<E>): Promise<E[]> {
       return this.repository.find(filter);
     }
 
-    @patch(basePath, {
-      responses: {
-        '200': {
-          description: 'PATCH success count',
-          content: {'application/json': {schema: CountSchema}},
-        },
-      },
+    @operatorDecorator({
+      op: 'PATCH',
+      path: `${basePath}`,
+      name: repoEntity.name,
+      customSchema: CountSchema,
+      requestDescription: 'PATCH success count',
+      disable: isDisable('updateAll'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async updateAll(
-      @requestBody({
-        content: {
-          'application/json': {
-            schema: getModelSchemaRef(repoEntity, {partial: true}),
-          },
-        },
-      })
+      @requestbody({partial: true})
       profile: E,
       @param.where(repoEntity) where?: Where<E>,
     ): Promise<Count> {
       return this.repository.updateAll(profile, where);
     }
 
-    @get(basePath + '/{id}', {
-      responses: {
-        '200': {
-          description: 'Entity model instance',
-          content: {
-            'application/json': {
-              schema: getModelSchemaRef(repoEntity, {includeRelations: true}),
-            },
-          },
-        },
-      },
+    @operatorDecorator({
+      op: 'GET',
+      path: `${basePath}/id`,
+      name: repoEntity.name,
+      customSchema: getModelSchemaRef(repoEntity, {includeRelations: true}),
+      disable: isDisable('findById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async findById(
@@ -255,12 +234,13 @@ export function CrudControllerMixin<
       return this.repository.findById(id, filter);
     }
 
-    @patch(basePath + '/{id}', {
-      responses: {
-        '204': {
-          description: 'Entity PATCH success',
-        },
-      },
+    @operatorDecorator({
+      op: 'PATCH',
+      path: `${basePath}/id`,
+      name: repoEntity.name,
+      customSchema: {},
+      responseDescription: 'Entity PATCH success',
+      disable: isDisable('updateById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async updateById(
@@ -277,12 +257,12 @@ export function CrudControllerMixin<
       await this.repository.updateById(id, profile);
     }
 
-    @put(basePath + '/{id}', {
-      responses: {
-        '204': {
-          description: 'Profile PUT success',
-        },
-      },
+    @operatorDecorator({
+      op: 'PUT',
+      path: `${basePath}/id`,
+      name: repoEntity.name,
+      model: repoEntity,
+      disable: isDisable('replaceById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async replaceById(
@@ -292,12 +272,12 @@ export function CrudControllerMixin<
       await this.repository.replaceById(id, profile);
     }
 
-    @del(basePath + '/{id}', {
-      responses: {
-        '204': {
-          description: 'Entity DELETE success',
-        },
-      },
+    @operatorDecorator({
+      op: 'DELETE',
+      path: `${basePath}/id`,
+      name: repoEntity.name,
+      responseDescription: 'DELETE success',
+      disable: isDisable('deleteById'),
     })
     @chain(...getDecoratorsProperties(options.properties))
     async deleteById(@param.path.string('id') id: ID): Promise<void> {
