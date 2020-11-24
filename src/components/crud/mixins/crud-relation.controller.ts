@@ -214,6 +214,7 @@ export function CrudRelationControllerMixin<
       name: repoEntity.name,
       model: repoEntityRelation,
       disable: isDisable('find'),
+      spec: optionsRelation.specs ? optionsRelation.specs['find'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async findRelationModel(
@@ -229,6 +230,9 @@ export function CrudRelationControllerMixin<
       name: repoEntity.name,
       model: repoEntityRelation,
       disable: isDisable('findById'),
+      spec: optionsRelation.specs
+        ? optionsRelation.specs['findById']
+        : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async getRelationModel(
@@ -255,6 +259,7 @@ export function CrudRelationControllerMixin<
       name: repoEntity.name,
       model: repoEntityRelation,
       disable: isDisable('create'),
+      spec: optionsRelation.specs ? optionsRelation.specs['create'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async createRelationModel(
@@ -271,6 +276,9 @@ export function CrudRelationControllerMixin<
       name: repoEntity.name,
       model: repoEntityRelation,
       disable: isDisable('updateById'),
+      spec: optionsRelation.specs
+        ? optionsRelation.specs['updateById']
+        : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async putRelationModelById(
@@ -290,6 +298,9 @@ export function CrudRelationControllerMixin<
       name: repoEntity.name,
       model: repoEntityRelation,
       disable: isDisable('deleteById'),
+      spec: optionsRelation.specs
+        ? optionsRelation.specs['deleteById']
+        : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async delRelationModel(@parampath() id: IDS, @parampathrelation() fk: IDR) {

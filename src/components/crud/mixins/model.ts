@@ -6,6 +6,7 @@ import {
   Class,
   Repository,
 } from '@loopback/repository';
+import {OperationObject} from '@loopback/rest';
 import {ControllerMixinOptions} from '../../../helpers';
 
 // Liste des opérations fournis par les CrudController
@@ -48,6 +49,7 @@ export interface CrudControllerMixinOptions
   extends ControllerMixinOptions,
     CrudMixinOptions {
   disables?: CrudOperators[];
+  specs?: {[id in CrudOperators]: OperationObject};
 }
 
 // Définition de la relation d'un model a exposer

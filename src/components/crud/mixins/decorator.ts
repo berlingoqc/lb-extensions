@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/naming-convention */
 import {
   param,
@@ -5,6 +6,10 @@ import {
   requestBody,
   getModelSchemaRef,
   operation,
+  OperationObject,
+  ResponsesObject,
+  SchemaObject,
+  ReferenceObject,
 } from '@loopback/rest';
 import {ModelDef} from './model';
 
@@ -61,18 +66,33 @@ export function disable() {
 }
 
 export function operatorDecorator(opts: {
+  // Type d'opération
   op: 'POST' | 'GET' | 'PUT' | 'DELETE' | 'PATCH';
+  // Path ou residera l'API
   path: string;
+  // Nom de la fonction
   name: string;
+  // Le modèle qui est retourner (utiliser si pas de customSchema)
   model?: ModelDef;
-  customSchema?: any;
-  additionalResponses?: any;
+  // Schema custom utilisé en priorité sur model
+  customSchema?: SchemaObject | ReferenceObject;
+  // Réponse additionel qui seront ajoutés
+  additionalResponses?: ResponsesObject;
+  // Http status code par default pour la request (200 par default)
+  defaultResponse?: string;
+  // Description de la request
   requestDescription?: string;
+  // Description de la response générer seulement model
   responseDescription?: string;
+  // Si disable l'api ne sera pas exposer
   disable?: boolean;
+  // Specification de l'OperationObject qui sera merge avec
+  // l'object générer pour permettre de rajouter au de overwrite
+  // les champs
+  spec?: OperationObject;
 }) {
   if (opts.disable) return () => {};
-  const spec = {
+  let spec: OperationObject = {
     'x-controller-name': `${opts.name}Controller`,
     description:
       opts.requestDescription ?? defaultRequestDescription[opts.op](opts.name),
@@ -92,7 +112,10 @@ export function operatorDecorator(opts: {
     },
   };
   if (opts.additionalResponses) {
-    spec.responses = Object.assign(spec.responses);
+    spec.responses = Object.assign(spec.responses, opts.additionalResponses);
+  }
+  if (opts.spec) {
+    spec = Object.assign(spec, opts.spec);
   }
   return operation(opts.op, opts.path, spec);
 }

@@ -118,6 +118,7 @@ export function CrudControllerMixin<
       name: repoEntity.name,
       model: repoEntity,
       disable: isDisable('create'),
+      spec: options.specs ? options.specs['create'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async create(
@@ -133,6 +134,7 @@ export function CrudControllerMixin<
       name: repoEntity.name,
       customSchema: CountSchema,
       disable: isDisable('count'),
+      spec: options.specs ? options.specs['count'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async count(@param.where(repoEntity) where?: Where<E>): Promise<Count> {
@@ -148,6 +150,7 @@ export function CrudControllerMixin<
         items: getModelSchemaRef(repoEntity, {includeRelations: true}),
       },
       disable: isDisable('find'),
+      spec: options.specs ? options.specs['find'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async find(@param.filter(repoEntity) filter?: Filter<E>): Promise<E[]> {
@@ -161,6 +164,7 @@ export function CrudControllerMixin<
       customSchema: CountSchema,
       requestDescription: 'PATCH success count',
       disable: isDisable('updateAll'),
+      spec: options.specs ? options.specs['updateAll'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async updateAll(
@@ -177,6 +181,7 @@ export function CrudControllerMixin<
       name: repoEntity.name,
       customSchema: getModelSchemaRef(repoEntity, {includeRelations: true}),
       disable: isDisable('findById'),
+      spec: options.specs ? options.specs['findById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async findById(
@@ -192,8 +197,10 @@ export function CrudControllerMixin<
       path: `${basePath}/{id}`,
       name: repoEntity.name,
       customSchema: {},
+      defaultResponse: '204',
       responseDescription: 'Entity PATCH success',
       disable: isDisable('updateById'),
+      spec: options.specs ? options.specs['updateById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async updateById(
@@ -208,8 +215,10 @@ export function CrudControllerMixin<
       op: 'PUT',
       path: `${basePath}/{id}`,
       name: repoEntity.name,
-      model: repoEntity,
+      customSchema: {},
+      defaultResponse: '204',
       disable: isDisable('replaceById'),
+      spec: options.specs ? options.specs['replaceById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async replaceById(
@@ -223,8 +232,11 @@ export function CrudControllerMixin<
       op: 'DELETE',
       path: `${basePath}/{id}`,
       name: repoEntity.name,
+      customSchema: {},
       responseDescription: 'DELETE success',
+      defaultResponse: '204',
       disable: isDisable('deleteById'),
+      spec: options.specs ? options.specs['deleteById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
     async deleteById(@param.path.string('id') id: ID): Promise<void> {
