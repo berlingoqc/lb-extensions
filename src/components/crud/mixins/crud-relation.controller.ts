@@ -121,6 +121,12 @@ export const addCrudRelationController = <
  * @param repoEntityRelation
  * @param options
  * @param optionsRelation
+ *
+ * @template T Type de constructeur de l'object qu'on applique le mixin
+ * @template ES Entité Source. Le type du model qui contient la relation
+ * @template IDS ID Source. Le type de l'identifiant de l'Entité Source
+ * @template ER Entité Relation. Le type du model de la relation qu'on expose
+ * @template IDR ID Relation. Le type de l'identifiant de l'Identifiant de la relation
  */
 export function CrudRelationControllerMixin<
   T extends MixinTarget<object>,
