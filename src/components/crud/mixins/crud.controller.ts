@@ -103,7 +103,7 @@ export function CrudControllerMixin<
   const omitId =
     options.omitId === undefined || options.omitId === true ? [options.id] : [];
 
-  const isDisable = (funcName: CrudOperators) =>
+  const isDisabled = (funcName: CrudOperators) =>
     options.disables ? options.disables.indexOf(funcName) > -1 : false;
 
   // wrap to use to correct property decorator to get id from request
@@ -117,7 +117,7 @@ export function CrudControllerMixin<
       path: `${basePath}`,
       name: repoEntity.name,
       model: repoEntity,
-      disable: isDisable('create'),
+      disable: isDisabled('create'),
       spec: options.specs ? options.specs['create'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -133,7 +133,7 @@ export function CrudControllerMixin<
       path: `${basePath}/count`,
       name: repoEntity.name,
       customSchema: CountSchema,
-      disable: isDisable('count'),
+      disable: isDisabled('count'),
       spec: options.specs ? options.specs['count'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -149,7 +149,7 @@ export function CrudControllerMixin<
         type: 'array',
         items: getModelSchemaRef(repoEntity, {includeRelations: true}),
       },
-      disable: isDisable('find'),
+      disable: isDisabled('find'),
       spec: options.specs ? options.specs['find'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -163,7 +163,7 @@ export function CrudControllerMixin<
       name: repoEntity.name,
       customSchema: CountSchema,
       requestDescription: 'PATCH success count',
-      disable: isDisable('updateAll'),
+      disable: isDisabled('updateAll'),
       spec: options.specs ? options.specs['updateAll'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -180,7 +180,7 @@ export function CrudControllerMixin<
       path: `${basePath}/{id}`,
       name: repoEntity.name,
       customSchema: getModelSchemaRef(repoEntity, {includeRelations: true}),
-      disable: isDisable('findById'),
+      disable: isDisabled('findById'),
       spec: options.specs ? options.specs['findById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -199,7 +199,7 @@ export function CrudControllerMixin<
       customSchema: {},
       defaultResponse: '204',
       responseDescription: 'Entity PATCH success',
-      disable: isDisable('updateById'),
+      disable: isDisabled('updateById'),
       spec: options.specs ? options.specs['updateById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -217,7 +217,7 @@ export function CrudControllerMixin<
       name: repoEntity.name,
       customSchema: {},
       defaultResponse: '204',
-      disable: isDisable('replaceById'),
+      disable: isDisabled('replaceById'),
       spec: options.specs ? options.specs['replaceById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -235,7 +235,7 @@ export function CrudControllerMixin<
       customSchema: {},
       responseDescription: 'DELETE success',
       defaultResponse: '204',
-      disable: isDisable('deleteById'),
+      disable: isDisabled('deleteById'),
       spec: options.specs ? options.specs['deleteById'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))

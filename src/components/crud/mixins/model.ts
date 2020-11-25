@@ -48,7 +48,7 @@ export interface CrudMixinOptions {
 export interface CrudControllerMixinOptions
   extends ControllerMixinOptions,
     CrudMixinOptions {
-  disables?: CrudOperators[];
+  disableds?: CrudOperators[];
   specs?: {[id in CrudOperators]: OperationObject};
 }
 

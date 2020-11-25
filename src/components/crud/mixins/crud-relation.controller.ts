@@ -149,12 +149,15 @@ export function CrudRelationControllerMixin<
   if (!optionsRelation.properties) optionsRelation.properties = [];
 
   // Map pour les API qui sont `disabled`
-  let disableApiMap: {[id: string]: boolean} = {};
-  const isDisable = (call: CrudOperators) => {
+  let disabledApiMap: {[id: string]: boolean} = {};
+  const isDisabled = (call: CrudOperators) => {
     // regarde si desactivé dans la map
-    if (disableApiMap[call]) return true;
+    if (disabledApiMap[call]) return true;
     // regarde si desactivé pour le user
-    if (optionsRelation.disables && optionsRelation.disables.indexOf(call) > -1)
+    if (
+      optionsRelation.disableds &&
+      optionsRelation.disableds.indexOf(call) > -1
+    )
       return true;
     return false;
   };
@@ -188,7 +191,7 @@ export function CrudRelationControllerMixin<
       switch (accessorString) {
         case 'BelongsTo':
           findData = (id: any) => this.getRelationThings(id);
-          disableApiMap = {
+          disabledApiMap = {
             create: true,
             findById: true,
             updateById: true,
@@ -197,7 +200,7 @@ export function CrudRelationControllerMixin<
           break;
         case 'HasOne':
           findData = (id: any) => this.getRelationThings(id).get();
-          disableApiMap = {
+          disabledApiMap = {
             findById: true,
           };
           break;
@@ -213,7 +216,7 @@ export function CrudRelationControllerMixin<
       path: basePath,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('find'),
+      disable: isDisabled('find'),
       spec: optionsRelation.specs ? optionsRelation.specs['find'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -229,7 +232,7 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('findById'),
+      disable: isDisabled('findById'),
       spec: optionsRelation.specs
         ? optionsRelation.specs['findById']
         : undefined,
@@ -258,7 +261,7 @@ export function CrudRelationControllerMixin<
       path: basePath,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('create'),
+      disable: isDisabled('create'),
       spec: optionsRelation.specs ? optionsRelation.specs['create'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -275,7 +278,7 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('updateById'),
+      disable: isDisabled('updateById'),
       spec: optionsRelation.specs
         ? optionsRelation.specs['updateById']
         : undefined,
@@ -297,7 +300,7 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisable('deleteById'),
+      disable: isDisabled('deleteById'),
       spec: optionsRelation.specs
         ? optionsRelation.specs['deleteById']
         : undefined,

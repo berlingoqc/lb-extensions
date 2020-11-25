@@ -85,13 +85,13 @@ export function operatorDecorator(opts: {
   // Description de la response générer seulement model
   responseDescription?: string;
   // Si disable l'api ne sera pas exposer
-  disable?: boolean;
+  disabled?: boolean;
   // Specification de l'OperationObject qui sera merge avec
   // l'object générer pour permettre de rajouter au de overwrite
   // les champs
   spec?: OperationObject;
 }) {
-  if (opts.disable) return () => {};
+  if (opts.disabled) return () => {};
   let spec: OperationObject = {
     'x-controller-name': `${opts.name}Controller`,
     description:
