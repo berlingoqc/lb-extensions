@@ -14,8 +14,9 @@ import {
 import {ModelDef} from './model';
 
 /**
- * Contient des decorateur et des functions qui génères
- * des décorateur pour simplifier les decorateur de @loopback/rest
+ * Ce fichier contient l'ensemble des décorateurs utilisés.
+ * Principalement dans le but de simplifier les décorateur du
+ * package @loopback/rest
  */
 
 const defaultResponseDescription = {
@@ -82,13 +83,12 @@ export function operatorDecorator(opts: {
   defaultResponse?: string;
   // Description de la request
   requestDescription?: string;
-  // Description de la response générer seulement model
+  // Description de la response générer
   responseDescription?: string;
   // Si disable l'api ne sera pas exposer
   disabled?: boolean;
-  // Specification de l'OperationObject qui sera merge avec
-  // l'object générer pour permettre de rajouter au de overwrite
-  // les champs
+  // OperationObject qui sera merge avec
+  // l'object générer pour permettre de rajouter ou de overwrite les propriétés
   spec?: OperationObject;
 }) {
   if (opts.disabled) return () => {};
