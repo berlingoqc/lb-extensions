@@ -9,7 +9,7 @@ import {
 import {OperationObject} from '@loopback/rest';
 import {ControllerMixinOptions} from '../../../helpers';
 
-// Liste des opérations fournis par les CrudController
+// Liste des opérations fournies par les CrudController
 export type CrudOperators =
   | 'find'
   | 'deleteById'
@@ -20,7 +20,7 @@ export type CrudOperators =
   | 'count'
   | 'create';
 
-// ModelDef : définition d'une model qui peut être exposé
+// ModelDef : définition d'un modèle qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;
 
 // InjectableRepository est une union des types qui peuvent

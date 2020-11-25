@@ -21,10 +21,10 @@ import {
   ModelDef,
 } from './model';
 
-// Les différents types Accessor de relation qui sont disponible pour CrudRelationController
+// Les différents types de relation Accessor qui sont disponibles pour CrudRelationController
 export type AccessorType = 'BelongsTo' | 'HasMany' | 'HasOne';
 
-// Fonction pour identifié si l'object est de que'elle AccessorType
+// Fonction pour identifier le type de AccessorType est l'objet
 // La méthode est rudimentaire parce que je ne trouvais pas de meilleur
 // facon pour tester que l'object item implémente l'interface alors
 // je vais faire un toString de l'item qui me donne le code source
@@ -105,7 +105,7 @@ export const addCrudRelationController = <
  * d'un modèle avec les accessor de relations dans le repository
  * du model parent.
  * Pour l'utiliser sur votre relation vous devez déclarer vos accessor
- * dans votre repository. Peux être fait avec la commande `lb4 relation`
+ * dans votre repository. Peut être fait avec la commande `lb4 relation`
  *
  * Pour une relation BelongsTo les api suivants sont innaccessible:
  *  * create
@@ -148,12 +148,12 @@ export function CrudRelationControllerMixin<
   if (!optionsRelation.idType) optionsRelation.idType = 'number';
   if (!optionsRelation.properties) optionsRelation.properties = [];
 
-  // Map pour les API qui sont disables
+  // Map pour les API qui sont `disabled`
   let disableApiMap: {[id: string]: boolean} = {};
   const isDisable = (call: CrudOperators) => {
-    // regarde si desactiver dans la map
+    // regarde si desactivé dans la map
     if (disableApiMap[call]) return true;
-    // regarde si desactiver pour le user
+    // regarde si desactivé pour le user
     if (optionsRelation.disables && optionsRelation.disables.indexOf(call) > -1)
       return true;
     return false;
@@ -179,7 +179,7 @@ export function CrudRelationControllerMixin<
       const relationAccessor = this.repository[optionsRelation.name];
       if (!relationAccessor) {
         throw new HttpErrors.BadRequest(
-          `Relation ${optionsRelation.name} dont exist on ${options.name}Repository`,
+          `Relation ${optionsRelation.name} doesn't exist on ${options.name}Repository`,
         );
       }
       // Détermine le type de relation pour désactiver les API et avoir les
@@ -247,7 +247,7 @@ export function CrudRelationControllerMixin<
       if (items.length < 1) {
         throw new HttpErrors.NotFound('Item not found');
       } else if (items.length > 1) {
-        throw new HttpErrors.InternalServerError('To mutch item returned');
+        throw new HttpErrors.InternalServerError('Too many items');
       }
 
       return items[0];

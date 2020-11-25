@@ -35,7 +35,7 @@ const defaultRequestDescription = {
 };
 
 // Fonction qui wrap autour de param.path{string,number} pour
-// des utilisation dynamiques.
+// des utilisations dynamiques.
 export function parampathFunction(idType: string, idName = 'id') {
   return () => {
     return (target: object, member: string, index: number) => {
@@ -54,7 +54,7 @@ export function parampathFunction(idType: string, idName = 'id') {
 }
 
 // Decorator to add to an operation that
-// you don't wont to be enable
+// you want disabled
 export function disable() {
   return (target: any, key: string, descriptor: any) => {
     descriptor.value = function () {
@@ -72,11 +72,11 @@ export function operatorDecorator(opts: {
   path: string;
   // Nom de la fonction
   name: string;
-  // Le modèle qui est retourner (utiliser si pas de customSchema)
+  // Le modèle qui est retourné (utiliser si pas de customSchema)
   model?: ModelDef;
   // Schema custom utilisé en priorité sur model
   customSchema?: SchemaObject | ReferenceObject;
-  // Réponse additionel qui seront ajoutés
+  // Réponse additionelle qui sera ajoutée
   additionalResponses?: ResponsesObject;
   // Http status code par default pour la request (200 par default)
   defaultResponse?: string;

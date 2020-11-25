@@ -26,7 +26,7 @@ export function addCRUDModelsControllerWithRelations(
 }
 
 /**
- *  Fonction pour faciliter l'exposition d'un models etde ses relations par CRUD/REST
+ *  Fonction pour faciliter l'exposition d'un modèle et de ses relations par CRUD/REST
  *
  * @param app : Application qui a le mixin RestApplication
  * @param modelDef : La définition de la class qui est exposer

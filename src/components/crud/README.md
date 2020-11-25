@@ -7,15 +7,15 @@ Le but est de réduire le boilerplate code qui doit etre ajouté dans
 les controllers pour exposer le repository. Et dans le plus part des cas
 nous n'avons pas à les modifiés seulement à ajoutés des décorateurs.
 
-## Exposition de model et relations en une étape
+## Exposition de modèles et relations en une étape
 
-Vous pouvez dynamiquement ajouté un controlleur pour un model avec les
-relations de façon anonyme. Cette méthode est favoriser et si vous
-désirez ajouté d'autre fonctionne faite un autre controller qui sert
+Vous pouvez dynamiquement ajouter un contrôleur pour un modèle avec les
+relations de façon anonyme. Cette méthode est à favoriser et si vous
+désirez ajouter d'autres fonctions, faites un autre contrôleur qui écoute sur
 le même endpoint. C'est plus simple et demande moins de boilerplate et
 de configuration.
 
-Pour le détails sur la configuration voire les commentaires [ici](mixins/crud.controller.ts)
+Pour plus de détails sur la configuration, voir les commentaires [ici](mixins/crud.controller.ts)
 
 ```typescript
 import { addCRUDModelsControllerWithRelations  } from '@alborea/loopback-sso-extensions';
@@ -26,7 +26,7 @@ const MODELS: CrudModelWithRelationss = [
     model: MonModel,
     repo: MonModelRepository,
     options: {
-      names: 'profiles,
+      names: 'profiles',
     },
     relations: [
       {
@@ -58,14 +58,14 @@ export class MonApplication extends BootMixin(
 
 ```
 
-## List des API générés
+## Liste des API générés
 
-Voici une description rapides des fonctions qui sont ajoutés
+Voici une description rapide des fonctions qui sont ajoutées
 par le mixin.
 
 ### CRUDModel
 
-La racine de l'api est le nom spécifié
+La racine de l'API est le nom spécifié
 
 | Name        | OP     | PATH   |
 | ----------- | ------ | ------ |
@@ -80,7 +80,7 @@ La racine de l'api est le nom spécifié
 
 ### CRUDRelationModel
 
-La racine de l'api est le nom spécifié pour le model parent
+La racine de l'API est le nom spécifié pour le modèle parent
 l'id de l'item.
 
 ex: /parent/1/...
