@@ -80,8 +80,7 @@ La racine de l'API est le nom spécifié
 
 ### CRUDRelationModel
 
-La racine de l'API est le nom spécifié pour le modèle parent
-l'id de l'item.
+La racine de l'API est le nom spécifié pour le modèle parent et l'id de l'item.
 
 ex: /parent/1/...
 

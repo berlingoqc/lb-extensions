@@ -216,7 +216,7 @@ export function CrudRelationControllerMixin<
       path: basePath,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisabled('find'),
+      disabled: isDisabled('find'),
       spec: optionsRelation.specs ? optionsRelation.specs['find'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -232,7 +232,7 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisabled('findById'),
+      disabled: isDisabled('findById'),
       spec: optionsRelation.specs
         ? optionsRelation.specs['findById']
         : undefined,
@@ -261,7 +261,7 @@ export function CrudRelationControllerMixin<
       path: basePath,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisabled('create'),
+      disabled: isDisabled('create'),
       spec: optionsRelation.specs ? optionsRelation.specs['create'] : undefined,
     })
     @chain(...getDecoratorsProperties(options.properties))
@@ -278,7 +278,7 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisabled('updateById'),
+      disabled: isDisabled('updateById'),
       spec: optionsRelation.specs
         ? optionsRelation.specs['updateById']
         : undefined,
@@ -300,7 +300,7 @@ export function CrudRelationControllerMixin<
       path: `${basePath}/{fk}`,
       name: repoEntity.name,
       model: repoEntityRelation,
-      disable: isDisabled('deleteById'),
+      disabled: isDisabled('deleteById'),
       spec: optionsRelation.specs
         ? optionsRelation.specs['deleteById']
         : undefined,
