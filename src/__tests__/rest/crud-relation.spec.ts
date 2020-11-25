@@ -113,7 +113,7 @@ export class OneModelRepository extends DefaultCrudRepository<
   }
 }
 
-describe.only('Test CrudRelationController', () => {
+describe('Test CrudRelationController', () => {
   let app: TestApplication;
   let client: supertest.SuperTest<supertest.Test>;
 
