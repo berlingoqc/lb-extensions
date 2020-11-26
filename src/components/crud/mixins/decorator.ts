@@ -30,9 +30,9 @@ const defaultResponseDescription = {
 const defaultRequestDescription = {
   POST: (name: string) => `Create a new instance of ${name}`,
   GET: (name: string) => `Get a filter list of ${name}`,
-  PUT: (name: string) => `Update a instance of ${name}`,
+  PUT: (name: string) => `Replace a instance of ${name}`,
   DELETE: (name: string) => `Delete a instance of ${name}`,
-  PATCH: (name: string) => `Replace a instance of ${name}`,
+  PATCH: (name: string) => `Update a instance of ${name}`,
 };
 
 // Fonction qui wrap autour de param.path{string,number} pour
