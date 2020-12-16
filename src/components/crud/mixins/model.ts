@@ -20,6 +20,9 @@ export type CrudOperators =
   | 'count'
   | 'create';
 
+// Les différents types de relation Accessor qui sont disponibles pour CrudRelationController
+export type AccessorType = 'BelongsTo' | 'HasMany' | 'HasOne';
+
 // ModelDef : définition d'un modèle qui peut être exposé
 export type ModelDef = Function & {prototype: any} & typeof Model;
 
@@ -52,12 +55,17 @@ export interface CrudControllerMixinOptions
   specs?: {[id in CrudOperators]: OperationObject};
 }
 
+export interface CrudRelationControllerMixinOptions
+  extends CrudControllerMixinOptions {
+  accessorType: AccessorType;
+}
+
 // Définition de la relation d'un model a exposer
 export interface ModelRelation {
   // Définition du Model
   modelRelationDef: ModelDef;
   // Options pour le controller
-  optionsRelation: CrudControllerMixinOptions;
+  optionsRelation: CrudRelationControllerMixinOptions;
 }
 
 // Model pour définir une model avec ses relations à exposer

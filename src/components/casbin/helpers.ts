@@ -63,7 +63,10 @@ export function voterInjectObject(
   repoName: string,
   ownerProperty: string,
   keepOriginal = true,
-  filter: Filter = {},
+  filter: Pick<
+    Filter<any>,
+    'fields' | 'include' | 'limit' | 'offset' | 'order' | 'skip'
+  > = {},
 ) {
   let repo: EntityCrudRepository<Entity, null, object>;
   return async (ctx: AuthorizationContext, md: AuthorizationMetadata) => {

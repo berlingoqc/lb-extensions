@@ -17,34 +17,10 @@ import {
 import {
   CrudControllerMixinOptions,
   CrudOperators,
+  CrudRelationControllerMixinOptions,
   InjectableRepository,
   ModelDef,
 } from './model';
-
-// Les différents types de relation Accessor qui sont disponibles pour CrudRelationController
-export type AccessorType = 'BelongsTo' | 'HasMany' | 'HasOne';
-
-// Fonction pour identifier le type de AccessorType est l'objet
-// La méthode est rudimentaire parce que je ne trouvais pas de meilleur
-// facon pour tester que l'object item implémente l'interface alors
-// je vais faire un toString de l'item qui me donne le code source
-// que je parse pour voire de quelle classe il s'agit.
-// Fonctionne et simple mais il faudrait mieux que ça
-export function identityAccessorType(item: any): AccessorType {
-  const str = item.toString();
-  if (str) {
-    if (str.includes('HasMany')) {
-      return 'HasMany';
-    } else if (str.includes('HasOne')) {
-      return 'HasOne';
-    } else if (str.includes('BelongsTo')) {
-      return 'BelongsTo';
-    }
-  }
-  throw new HttpErrors.BadRequest(
-    'Relation is not an HasMany, HasOne or BelongTo',
-  );
-}
 
 // Permet d'ajouter directement un CrudRelationController anonyme
 // dans votre application
@@ -59,7 +35,7 @@ export const addCrudRelationController = <
   modelRelationRef: ModelDef,
   repo: InjectableRepository<E, ID>,
   options: CrudControllerMixinOptions,
-  optionsRelation: CrudControllerMixinOptions,
+  optionsRelation: CrudRelationControllerMixinOptions,
 ) => {
   const name =
     typeof repo === 'string'
@@ -88,7 +64,6 @@ export const addCrudRelationController = <
         }
       }
       this.repository = crudRepository;
-
       this.validateTypeOfAccessor();
     }
   }
@@ -139,7 +114,7 @@ export function CrudRelationControllerMixin<
   repoEntity: Function & {prototype: any} & typeof Model,
   repoEntityRelation: Function & {prototype: any} & typeof Model,
   options: CrudControllerMixinOptions,
-  optionsRelation: CrudControllerMixinOptions,
+  optionsRelation: CrudRelationControllerMixinOptions,
 ) {
   const basePath = `${options.basePath ?? ''}/${options.name}/{id}/${
     optionsRelation.name
@@ -177,43 +152,54 @@ export function CrudRelationControllerMixin<
   const parampathrelation = parampathFunction(options.idType, 'fk');
   const requestbody = requestBodyDecoratorGetter(repoEntityRelation);
 
-  let accessorString: AccessorType;
-
   let findData: (id: any, filter: any) => any;
 
-  class CrudRelationController extends superClass {
-    repository: DefaultCrudRepository<any, any, {}> & any;
+  let repository: DefaultCrudRepository<any, any, {}> & any;
 
+  const getRelationThings = (id: any) => {
+    const relations = repository[optionsRelation.name](id);
+    if (!relations) {
+      throw new HttpErrors.InternalServerError('Relation not loaded ' + id);
+    }
+    return relations;
+  };
+
+  switch (optionsRelation.accessorType) {
+    case 'BelongsTo':
+      findData = (id: any) => getRelationThings(id);
+      disabledApiMap = {
+        create: true,
+        findById: true,
+        updateById: true,
+        deleteById: true,
+      };
+      break;
+    case 'HasOne':
+      findData = (id: any) => getRelationThings(id).get();
+      disabledApiMap = {
+        findById: true,
+      };
+      break;
+    case 'HasMany':
+      findData = (id: any, filter: any) => getRelationThings(id).find(filter);
+      break;
+  }
+
+  class CrudRelationController extends superClass {
+    set repository(r: DefaultCrudRepository<any, any, {}> & any) {
+      repository = r;
+    }
+    get repository() {
+      return repository;
+    }
+
+    // Configure les fonctionsexposer selon le type d'accessor
     validateTypeOfAccessor() {
       const relationAccessor = this.repository[optionsRelation.name];
       if (!relationAccessor) {
         throw new HttpErrors.BadRequest(
           `Relation ${optionsRelation.name} doesn't exist on ${options.name}Repository`,
         );
-      }
-      // Détermine le type de relation pour désactiver les API et avoir les
-      // bons callback
-      accessorString = identityAccessorType(relationAccessor);
-      switch (accessorString) {
-        case 'BelongsTo':
-          findData = (id: any) => this.getRelationThings(id);
-          disabledApiMap = {
-            create: true,
-            findById: true,
-            updateById: true,
-            deleteById: true,
-          };
-          break;
-        case 'HasOne':
-          findData = (id: any) => this.getRelationThings(id).get();
-          disabledApiMap = {
-            findById: true,
-          };
-          break;
-        case 'HasMany':
-          findData = (id: any, filter: any) =>
-            this.getRelationThings(id).find(filter);
-          break;
       }
     }
 
@@ -252,7 +238,7 @@ export function CrudRelationControllerMixin<
       const filterCertified = Object.assign(filter, {
         where: {[optionsRelation.id + '']: fk},
       });
-      const items = await this.getRelationThings(id).find(filterCertified);
+      const items = await getRelationThings(id).find(filterCertified);
       if (items.length < 1) {
         throw new HttpErrors.NotFound('Item not found');
       } else if (items.length > 1) {
@@ -276,7 +262,7 @@ export function CrudRelationControllerMixin<
       @requestbody({partial: true, exclude: omitId})
       body: Partial<ER>,
     ) {
-      return this.getRelationThings(id).create(body);
+      return getRelationThings(id).create(body);
     }
 
     @operatorDecorator({
@@ -295,7 +281,7 @@ export function CrudRelationControllerMixin<
       @parampathrelation() fk: IDR,
       @requestbody({partial: true}) body: Partial<ER>,
     ) {
-      await this.getRelationThings(id).patch(body, {
+      await getRelationThings(id).patch(body, {
         [optionsRelation.id as string | number]: fk,
       });
       return;
@@ -313,18 +299,10 @@ export function CrudRelationControllerMixin<
     })
     @chain(...getDecoratorsProperties(options.properties))
     async delRelationModel(@parampath() id: IDS, @parampathrelation() fk: IDR) {
-      await this.getRelationThings(id).delete({
+      await getRelationThings(id).delete({
         [optionsRelation.id as string | number]: fk,
       });
       return;
-    }
-
-    getRelationThings(id: any) {
-      const relations = this.repository[optionsRelation.name](id);
-      if (!relations) {
-        throw new HttpErrors.InternalServerError('Relation not loaded ' + id);
-      }
-      return relations;
     }
   }
 

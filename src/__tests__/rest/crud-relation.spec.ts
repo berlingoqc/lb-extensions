@@ -140,12 +140,10 @@ describe('Test CrudRelationController', () => {
   describe('Test CRUD Relation par REST', () => {
     let customModelRepo: CustomModelRepository;
     let oneModelRepo: OneModelRepository;
-    let manyModelRepo: ManyModelRepository;
 
     before(async () => {
       customModelRepo = await app.getRepository(CustomModelRepository);
       oneModelRepo = await app.getRepository(OneModelRepository);
-      manyModelRepo = await app.getRepository(ManyModelRepository);
 
       addCRUDControllerWithRelations(
         app,
@@ -160,12 +158,14 @@ describe('Test CrudRelationController', () => {
             modelRelationDef: OneModel,
             optionsRelation: {
               name: 'one',
+              accessorType: 'HasOne',
             },
           },
           {
             modelRelationDef: ManyModel,
             optionsRelation: {
               name: 'manies',
+              accessorType: 'HasMany',
             },
           },
         ],
@@ -178,7 +178,7 @@ describe('Test CrudRelationController', () => {
         [
           {
             modelRelationDef: CustomModel,
-            optionsRelation: {name: 'customModel'},
+            optionsRelation: {name: 'customModel', accessorType: 'BelongsTo'},
           },
         ],
       );
