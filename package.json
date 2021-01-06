@@ -1,6 +1,6 @@
 {
   "name": "@alborea/loopback-sso-extensions",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Extension to add authentification based on JWT remote or locally to your loopback application",
   "keywords": [
     "loopback-extension",
@@ -50,6 +50,7 @@
     "@loopback/rest": "^9.1.1",
     "@loopback/rest-explorer": "^3.0.5",
     "@types/request-promise-native": "^1.0.17",
+    "bcryptjs": "^2.4.3",
     "casbin": "^5.1.6",
     "dot": "^1.1.3",
     "multer": "^1.4.2",
@@ -62,6 +63,7 @@
     "@loopback/build": "^6.2.8",
     "@loopback/eslint-config": "^10.0.4",
     "@loopback/testlab": "^3.2.10",
+    "@types/bcryptjs": "^2.4.2",
     "@types/dot": "^1.1.4",
     "@types/multer": "^1.4.4",
     "@types/node": "^12.19.9",
