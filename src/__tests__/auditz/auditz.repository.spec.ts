@@ -166,8 +166,8 @@ describe('Repository avec AuditzMixin sans revision', () => {
 
       const itemBeforeUpdate = await repo.findById(1);
 
-      expect(itemBeforeUpdate.updatedAt).to.be.undefined();
-      expect(itemBeforeUpdate.updatedBy).to.be.undefined();
+      expect(itemBeforeUpdate.updatedAt).to.not.undefined();
+      expect(itemBeforeUpdate.updatedBy).to.not.undefined();
 
       await repo.updateById(1, {autre: '123'});
 

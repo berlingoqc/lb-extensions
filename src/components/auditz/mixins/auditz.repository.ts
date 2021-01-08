@@ -146,6 +146,8 @@ export function AuditzRepositoryMixin<
       const user = await this.userGetter();
       entity.createdBy = user.id;
       entity.createdAt = new Date();
+      entity.updatedAt = new Date();
+      entity.updatedBy = user.id;
       const data = await super.create(entity, options);
       if (settings.revision)
         await this.revisionService.onCreate(table, data, data.getId());
@@ -160,6 +162,8 @@ export function AuditzRepositoryMixin<
       entities.forEach((entity) => {
         entity.createdBy = user.id;
         entity.createdAt = new Date();
+        entity.updatedBy = user.id;
+        entity.updatedAt = new Date();
       });
       const datas = await super.createAll(entities, options);
       if (settings.revision) {
