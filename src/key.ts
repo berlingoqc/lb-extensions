@@ -22,6 +22,10 @@ export namespace TokenServiceBindings {
   export const TOKEN_EXPIRES_IN = BindingKey.create<string>(
     'authentication.jwt.expires.in.seconds',
   );
+
+  export const TOKEN_QUERY_PARAM_NAME = BindingKey.create<string>(
+    'authentication.jwt.queryparam',
+  );
 }
 
 export namespace AuthorizationBindings {

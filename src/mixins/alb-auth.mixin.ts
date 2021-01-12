@@ -50,6 +50,10 @@ export function AlbAuthMixin<T extends MixinTarget<Application>>(
         throw new Error('Invalide strategy in options must be local or remote');
       }
 
+      this.bind(TokenServiceBindings.TOKEN_QUERY_PARAM_NAME).to(
+        this.options.tokenQueryName ?? 'token',
+      );
+
       this.initRestApplication(this as any);
       this.initBootMixin(this);
     }
