@@ -1,5 +1,6 @@
 import {BindingKey} from '@loopback/core';
 
+import {CasbinAdapter} from './adapter';
 export namespace CasbinBindings {
   // Bindings pour la factory d'enforcer
   export const FACTORY = BindingKey.create<object>('casbin.enforcer.factory');
@@ -11,6 +12,8 @@ export namespace CasbinBindings {
   export const POLICIES_PATH = BindingKey.create<{[id: string]: string}>(
     'casbin.policies.path',
   );
+
+  export const ADAPTER = BindingKey.create<CasbinAdapter>('casbin.adapter');
 
   // Bindings pour l'identificant de la ressource accéder
   export const RESOURCE_ID = BindingKey.create<string>('casbin.resourceId');

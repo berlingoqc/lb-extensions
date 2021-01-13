@@ -1,7 +1,7 @@
 import * as casbin from 'casbin';
 import {inject, Provider} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {LBCasbinAdapter} from '../adapter';
+import {CasbinAdapter, LBCasbinAdapter} from '../adapter';
 import {CasbinBindings} from '../keys';
 import {EnforcerByRoleOrFilter} from '../models';
 import {CasbinPolicyRepository} from '../repositories';
@@ -16,6 +16,8 @@ export class RepositoryEnforcerProvider
     private casbinModelPath: string,
     @repository(CasbinPolicyRepository)
     private policyRepository: CasbinPolicyRepository,
+    @inject(CasbinBindings.ADAPTER)
+    private adapter: CasbinAdapter,
   ) {}
 
   value(): EnforcerByRoleOrFilter {
@@ -44,9 +46,9 @@ export class RepositoryEnforcerProvider
         },
       },
     ) => {
-      const adapter = new LBCasbinAdapter(this.policyRepository, filter);
+      this.adapter.filter = filter;
       const enforcer = await casbin.newEnforcer();
-      await enforcer.initWithAdapter(this.casbinModelPath, adapter);
+      await enforcer.initWithAdapter(this.casbinModelPath, this.adapter);
 
       return enforcer;
     };

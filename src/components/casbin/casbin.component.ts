@@ -7,6 +7,7 @@ import {PoliciesController} from './controller';
 import {RolesService} from './services';
 import {CasbinBindings} from './keys';
 import {RepositoryEnforcerProvider} from './providers';
+import {LBCasbinAdapter} from './adapter';
 
 /**
  * Component pour fournir les fonctionnalités de Casbin.
@@ -29,5 +30,6 @@ export class CasbinComponent implements Component {
     Binding.bind(AuthorizationBindings.PROVIDER)
       .toProvider(CasbinAuthorizationProvider)
       .tag(AuthorizationTags.AUTHORIZER),
+    Binding.bind(CasbinBindings.ADAPTER).toClass(LBCasbinAdapter),
   ];
 }

@@ -1,15 +1,23 @@
+import {inject} from '@loopback/core';
 import * as casbin from 'casbin';
 import {CasbinPolicy} from './models';
 import {CasbinPolicyRepository} from './repositories';
 
+export interface CasbinAdapter extends casbin.Adapter {
+  filter: any;
+}
+
 /**
  * Adapater pour casbin qui utilise un Repository loopback
  */
-export class LBCasbinAdapter implements casbin.Adapter {
+export class LBCasbinAdapter implements CasbinAdapter {
   static DEBUG = require('debug')('alborea:acl:policy');
+
+  filter = {};
+
   constructor(
+    @inject('repositories.CasbinPolicyRepository')
     private policyRepository: CasbinPolicyRepository,
-    private filter = {},
   ) {}
 
   async loadPolicy(model: casbin.Model): Promise<void> {
@@ -39,7 +47,7 @@ export class LBCasbinAdapter implements casbin.Adapter {
     throw new Error('Method not implemented.');
   }
 
-  private loadPolicyEntry(policy: CasbinPolicy, model: casbin.Model) {
+  protected loadPolicyEntry(policy: CasbinPolicy, model: casbin.Model) {
     const result =
       policy.ptype +
       ', ' +
