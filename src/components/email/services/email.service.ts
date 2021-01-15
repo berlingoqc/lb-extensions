@@ -32,6 +32,8 @@ export class EmailSenderService {
     @inject(EmailBindings.TRANSPORTER) transport: mailer.Transport,
     @inject(EmailBindings.EMAIL_FROM, {optional: true})
     private emailFrom: string,
+    @inject(EmailBindings.DEV_EMAIL_TO, {optional: true})
+    private emailToOveride: string,
     @inject('repositories.EmailTemplatRepository', {optional: true})
     public emailTemplateRepo: EmailTemplateRepository,
   ) {
@@ -47,6 +49,10 @@ export class EmailSenderService {
    * @param option , nodemail options
    */
   async sendMail(option: mailer.SendMailOptions): Promise<any> {
+    if (this.emailToOveride) {
+      console.log('DEV overriding email to ', this.emailToOveride);
+      option.to = this.emailToOveride;
+    }
     option.from = this.validateEmailFrom(option.from);
     return this.transporter.sendMail(option);
   }
