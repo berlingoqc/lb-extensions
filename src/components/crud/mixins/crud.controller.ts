@@ -120,7 +120,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('create'),
       spec: options.specs ? options.specs['create'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'create'))
     async create(
       @requestbody({exclude: omitId})
       profile: Omit<E, 'id'>,
@@ -136,7 +136,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('count'),
       spec: options.specs ? options.specs['count'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'count'))
     async count(@param.where(repoEntity) where?: Where<E>): Promise<Count> {
       return this.repository.count(where);
     }
@@ -152,7 +152,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('find'),
       spec: options.specs ? options.specs['find'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'find'))
     async find(@param.filter(repoEntity) filter?: Filter<E>): Promise<E[]> {
       return this.repository.find(filter);
     }
@@ -166,7 +166,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('updateAll'),
       spec: options.specs ? options.specs['updateAll'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'updateAll'))
     async updateAll(
       @requestbody({partial: true})
       profile: E,
@@ -183,7 +183,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('findById'),
       spec: options.specs ? options.specs['findById'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'findById'))
     async findById(
       @parampath() id: ID,
       @param.filter(repoEntity, {exclude: 'where'})
@@ -202,7 +202,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('updateById'),
       spec: options.specs ? options.specs['updateById'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'updateById'))
     async updateById(
       @param.path.string('id') id: ID,
       @requestbody({partial: true, exclude: omitId})
@@ -220,7 +220,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('replaceById'),
       spec: options.specs ? options.specs['replaceById'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'replaceById'))
     async replaceById(
       @param.path.string('id') id: ID,
       @requestBody() profile: E,
@@ -238,7 +238,7 @@ export function CrudControllerMixin<
       disabled: isDisabled('deleteById'),
       spec: options.specs ? options.specs['deleteById'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'deleteById'))
     async deleteById(@param.path.string('id') id: ID): Promise<void> {
       await this.repository.deleteById(id);
     }

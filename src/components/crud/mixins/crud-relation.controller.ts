@@ -211,7 +211,7 @@ export function CrudRelationControllerMixin<
       disabled: isDisabled('find'),
       spec: optionsRelation.specs ? optionsRelation.specs['find'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'find'))
     async findRelationModel(
       @parampath() id: IDS,
       @param.query.object('filter') filter?: Filter<ER>,
@@ -229,7 +229,7 @@ export function CrudRelationControllerMixin<
         ? optionsRelation.specs['findById']
         : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'findById'))
     async getRelationModel(
       @parampath() id: IDS,
       @parampathrelation() fk: IDR,
@@ -256,7 +256,7 @@ export function CrudRelationControllerMixin<
       disabled: isDisabled('create'),
       spec: optionsRelation.specs ? optionsRelation.specs['create'] : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'create'))
     async createRelationModel(
       @parampath() id: IDS,
       @requestbody({partial: true, exclude: omitId})
@@ -275,7 +275,7 @@ export function CrudRelationControllerMixin<
         ? optionsRelation.specs['updateById']
         : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'updateById'))
     async putRelationModelById(
       @parampath() id: IDS,
       @parampathrelation() fk: IDR,
@@ -297,7 +297,7 @@ export function CrudRelationControllerMixin<
         ? optionsRelation.specs['deleteById']
         : undefined,
     })
-    @chain(...getDecoratorsProperties(options.properties))
+    @chain(...getDecoratorsProperties(options.properties, 'deleteById'))
     async delRelationModel(@parampath() id: IDS, @parampathrelation() fk: IDR) {
       await getRelationThings(id).delete({
         [optionsRelation.id as string | number]: fk,

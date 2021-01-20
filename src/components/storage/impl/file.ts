@@ -104,12 +104,14 @@ export class FileStorageService implements StorageProvider {
     req: Request,
     res: Response,
     options?: object,
-  ): Promise<void> {
+  ): Promise<FileMetadata[]> {
     return new Promise((resolv, reject) => {
       const mul = multer(this.getMulterConfig(container)).any();
       mul(req, res, (err: unknown) => {
         if (err) reject(err);
-        resolv();
+        resolv(
+          (req.files as Express.Multer.File[]).map((f) => ({name: f.filename})),
+        );
       });
     });
   }

@@ -38,7 +38,7 @@ export interface StorageProvider {
     req: Request,
     res: Response,
     options?: object,
-  ): Promise<void>;
+  ): Promise<FileMetadata[]>;
   uploadStream(
     container: string,
     file: string,

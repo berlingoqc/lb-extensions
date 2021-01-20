@@ -45,7 +45,7 @@ export class StorageService implements StorageProvider {
     req: Request,
     res: Response,
     options?: object,
-  ): Promise<void> {
+  ): Promise<FileMetadata[]> {
     return this.provider.upload(container, req, res, options);
   }
   uploadStream(

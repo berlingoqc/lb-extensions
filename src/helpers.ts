@@ -43,7 +43,7 @@ export function getDecoratorsProperties(
 ) {
   if (properties instanceof Array) {
     return properties;
-  } else if (typeof properties == 'object' && name) return properties[name];
+  } else if (properties && name) return properties[name] ?? [];
   throw new Error('Cant get decorator property no name provided with Map');
 }
 

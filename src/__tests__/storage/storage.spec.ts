@@ -61,10 +61,14 @@ describe('Storage component', () => {
     });
 
     it('Upload file into it', async () => {
-      await client
-        .post(`/containers/c1/upload`)
-        .attach('files', join(__dirname, fileName))
-        .expect(204);
+      const files = (
+        await client
+          .post(`/containers/c1/upload`)
+          .attach('files', join(__dirname, fileName))
+          .expect(200)
+      ).body as FileMetadata[];
+      expect(files).to.be.Array();
+      expect(files[0].name).to.eql(fileName);
     });
 
     it('Get file uploaded', async () => {
