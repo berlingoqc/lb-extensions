@@ -127,7 +127,11 @@ export function CrudRelationControllerMixin<
 
   if (!optionsRelation.id) optionsRelation.id = 'id';
   if (!optionsRelation.idType) optionsRelation.idType = 'number';
-  if (!optionsRelation.properties) optionsRelation.properties = [];
+
+  // Utilise les properties depuis relations si définis
+  options.properties = optionsRelation.properties
+    ? optionsRelation.properties
+    : optionsRelation.properties;
 
   // Map pour les API qui sont `disabled`
   let disabledApiMap: {[id: string]: boolean} = {};
