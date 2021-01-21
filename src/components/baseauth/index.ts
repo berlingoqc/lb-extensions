@@ -3,3 +3,4 @@ export * from './model';
 export * from './repository';
 export * from './user.service';
 export * from './jwt.service';
+export * from './controller';
