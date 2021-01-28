@@ -24,8 +24,8 @@ export class StorageService implements StorageProvider {
     return this.provider.createContainers(config);
   }
 
-  destroyContainer(name: string): Promise<void> {
-    return this.provider.destroyContainer(name);
+  deleteContainer(name: string): Promise<void> {
+    return this.provider.deleteContainer(name);
   }
 
   download(

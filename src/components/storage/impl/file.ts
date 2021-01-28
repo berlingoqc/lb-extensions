@@ -81,7 +81,7 @@ export class FileStorageService implements StorageProvider {
   }
 
   // Remove folder
-  async destroyContainer(name: string): Promise<void> {
+  async deleteContainer(name: string): Promise<void> {
     const containerPath = this.getContainerPath(name);
     fs.rmdirSync(containerPath, {recursive: true});
   }

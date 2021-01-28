@@ -65,7 +65,7 @@ export function StorageControllerMixin<T extends MixinTarget<object>>(
     @del('/containers/{name}')
     @chain(...getDecoratorsProperties(mixinClassDecorator?.properties))
     deleteContainer(@param.path.string('name') name: string) {
-      return this.storageService.destroyContainer(name);
+      return this.storageService.deleteContainer(name);
     }
 
     @get('/containers/{name}/files')

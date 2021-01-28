@@ -89,8 +89,8 @@ describe('Storage component', () => {
 
       await expect(service.getFile('c1', fileName)).to.be.rejected();
     });
-    it('Destroy container', async () => {
-      await expect(service.destroyContainer('c1')).to.be.fulfilled();
+    it('delete container', async () => {
+      await expect(service.deleteContainer('c1')).to.be.fulfilled();
     });
   });
 });

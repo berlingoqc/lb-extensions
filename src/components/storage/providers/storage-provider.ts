@@ -23,7 +23,7 @@ export interface StorageProvider {
   createContainers<T extends ContainerMetadata = ContainerMetadata>(
     config: T,
   ): Promise<object>;
-  destroyContainer(name: string): Promise<void>;
+  deleteContainer(name: string): Promise<void>;
 
   download(
     container: string,

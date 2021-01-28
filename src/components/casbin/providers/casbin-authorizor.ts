@@ -69,13 +69,13 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
 
     if (allowedRoles) {
       for (const role of allowedRoles) {
-        allow = await this.allowByRole(request, role);
+        allow = await this.allowByRole(request, metadata.resource, role);
         if (allow) {
           break;
         }
       }
     } else {
-      allow = await this.allowByRole(request);
+      allow = await this.allowByRole(request, metadata.resource);
     }
 
     CasbinAuthorizationProvider.DEBUG('final result: ', allow);
@@ -85,8 +85,12 @@ export class CasbinAuthorizationProvider implements Provider<Authorizer> {
     return AuthorizationDecision.ABSTAIN;
   }
 
-  private async allowByRole(request: any, role?: string): Promise<boolean> {
-    const enforcer = await this.enforcerFactory(role);
+  private async allowByRole(
+    request: any,
+    resource?: string,
+    role?: string,
+  ): Promise<boolean> {
+    const enforcer = await this.enforcerFactory(role, resource);
     if (!enforcer) return false;
 
     const allowedByRole = await enforcer.enforce(

@@ -21,31 +21,14 @@ export class RepositoryEnforcerProvider
   ) {}
 
   value(): EnforcerByRoleOrFilter {
-    return async (
-      role?: string,
-      subject?: string,
-      filter = {
-        where: {
-          or: [
-            {
-              // get les policy qui sont pour le role demander
-              ptype: 'p',
-              v0: role,
-            },
-            {
-              // get les groupes qui herite du role demander
-              ptype: 'g',
-              v1: role,
-            },
-            {
-              // get les groupes du subject
-              ptype: 'g',
-              v0: subject,
-            },
-          ],
-        },
-      },
-    ) => {
+    return async (role?: string, subject?: string, filter = {}) => {
+      filter.where = {or: []};
+      if (role) {
+        filter.where.or.push({ptype: 'p', v0: role}, {ptype: 'g', v1: role});
+      }
+      if (subject) {
+        filter.where.or.push({ptype: 'p', v1: subject});
+      }
       this.adapter.filter = filter;
       const enforcer = await casbin.newEnforcer();
       await enforcer.initWithAdapter(this.casbinModelPath, this.adapter);

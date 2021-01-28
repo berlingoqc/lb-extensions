@@ -71,7 +71,7 @@ File stores the data, such as a document or image. A file is always in one (and 
     </tr>
     <tr>
       <td>Delete specified container.</td>
-      <td>destroyContainer(container, cb)</td>
+      <td>deleteContainer(container, cb)</td>
       <td>DELETE<br>/api/containers/:container</td>
     </tr>
     <tr>
