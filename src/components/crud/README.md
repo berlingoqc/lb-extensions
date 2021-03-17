@@ -18,7 +18,7 @@ de configuration.
 Pour plus de détails sur la configuration, voir les commentaires [ici](mixins/crud.controller.ts)
 
 ```typescript
-import { addCRUDModelsControllerWithRelations  } from '@alborea/loopback-sso-extensions';
+import { addCRUDModelsControllerWithRelations  } from '@berlingoqc/loopback-sso-extensions';
 ....
 
 const MODELS: CrudModelWithRelationss = [

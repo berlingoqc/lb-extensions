@@ -41,7 +41,7 @@ describe('Email Component', function () {
     let service: EmailSenderService;
 
     // variable utilisé dans les tests
-    const emailTo = 'info@alborea.com';
+    const emailTo = 'info@berlingoqc.com';
     const emailFrom = 'portail@alphard.com';
 
     beforeEach(async () => {
@@ -50,14 +50,14 @@ describe('Email Component', function () {
       sinon.replace(
         service,
         'sendMail',
-        sinon.fake.resolves({accepted: ['info@alborea.com'], rejected: []}),
+        sinon.fake.resolves({accepted: ['info@berlingoqc.com'], rejected: []}),
       );
     });
 
     describe('Test construction', () => {
       it('Ne provided pas de EMAIL_FROM donc error si non spécifié', async () => {
         await expect(
-          service.sendMailFromTemplate('info@alborea.com', 'template'),
+          service.sendMailFromTemplate('info@berlingoqc.com', 'template'),
         ).to.be.rejected();
       });
     });
@@ -150,7 +150,7 @@ describe('Email Component', function () {
 
         it('Envoie un email depuis template de la base de donnée', async () => {
           const sendData = await service.sendMailFromTemplate(
-            'info@alborea.com',
+            'info@berlingoqc.com',
             'TEST',
             bodyData,
             titleData,
@@ -158,7 +158,7 @@ describe('Email Component', function () {
           );
 
           expect(sendData.template).to.be.eql(templateResolved);
-          expect(sendData.sendData.accepted).to.be.eql(['info@alborea.com']);
+          expect(sendData.sendData.accepted).to.be.eql(['info@berlingoqc.com']);
           expect(sendData.sendData.rejected).to.be.empty();
         });
       });

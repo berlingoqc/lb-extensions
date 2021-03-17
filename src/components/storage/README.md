@@ -18,7 +18,7 @@ Pour utiliser la component:
 
 ```typescript
 ...
-import { StorageComponent, StorageBindings, FileStorageService, addStorageController } from '@alborea/loopback-sso-extensions';
+import { StorageComponent, StorageBindings, FileStorageService, addStorageController } from '@berlingoqc/loopback-sso-extensions';
 ...
 export class MyApplication extends RestApplication(...) {
   constructor() {

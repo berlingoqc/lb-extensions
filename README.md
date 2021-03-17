@@ -1,4 +1,4 @@
-# @alborea/loopback-sso-extensions
+# @berlingoqc/loopback-sso-extensions
 
 [![LoopBack](<https://github.com/strongloop/loopback-next/raw/master/docs/site/imgs/branding/Powered-by-LoopBack-Badge-(blue)-@2x.png>)](http://loopback.io/)
 
@@ -14,7 +14,7 @@ Avec le mixin `AlbAuthMixin` qui ajoute et configure les éléments suivants
 - Ajout service de validation des rôles
 - Ajout d'une stratégie pour la récupération des JWT
   - JWTAutenticationStrategy qui valide le Token localement depuis la requête HTTP
-  - JWTRemoteStrategy qui valide le token avec une instance de @alborea/sso
+  - JWTRemoteStrategy qui valide le token avec une instance de @berlingoqc/sso
 - Configuration de l'application REST avec OpenAPI 3 avec l'information du package.json et la securitySchemes de configurer
 - Configure la séquence d'authentification qui peut être étendu avec `AlbLoopbackAuthBindings.SEQUENCE_PROVIDER`
 - Configure le RestExplorer

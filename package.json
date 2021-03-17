@@ -1,19 +1,19 @@
 {
-  "name": "@alborea/loopback-sso-extensions",
-  "version": "3.2.6",
-  "description": "Extension to add authentification based on JWT remote or locally to your loopback application",
+  "name": "@berlingoqc/lb-extensions",
+  "version": "1.0.0",
+  "description": "Extension for lb4",
   "keywords": [
     "loopback-extension",
     "loopback"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/alborea/loopback-sso-extensions/"
-  },
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "engines": {
     "node": ">=12.10"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berlingoqc/lb-extensions/"
   },
   "scripts": {
     "build": "lb-tsc",
