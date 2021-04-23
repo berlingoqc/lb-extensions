@@ -82,7 +82,6 @@ export function AlbAuthMixin<T extends MixinTarget<Application>>(
 
     initBootMixin(app: any) {
       app.projectRoot = this.options.dirname;
-      console.log(app.projectRoot);
       // Customize @loopback/boot Booter Conventions here
       app.bootOptions = {
         controllers: {

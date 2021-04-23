@@ -50,7 +50,7 @@ export class EmailSenderService {
    */
   async sendMail(option: mailer.SendMailOptions): Promise<any> {
     if (this.emailToOveride) {
-      console.log('DEV overriding email to ', this.emailToOveride);
+      // console.log('DEV overriding email to ', this.emailToOveride);
       option.to = this.emailToOveride;
     }
     option.from = this.validateEmailFrom(option.from);
