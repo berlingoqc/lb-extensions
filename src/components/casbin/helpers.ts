@@ -77,7 +77,7 @@ export function voterInjectObject(
     try {
       const item: any = await repo.findById(
         ctx.invocationContext.args[idIndex],
-        filter,
+        filter as any,
       );
       ctx.invocationContext.bind(CasbinBindings.ABAC_OBJECT).to({
         Owner: getSubjectFromId(item[ownerProperty]),
