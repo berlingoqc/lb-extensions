@@ -23,6 +23,10 @@ export class RoleAuthorizationProvider implements Provider<Authorizer> {
   ) {
     const roles: string[] = metadata.allowedRoles ?? [];
     const userRoles: string[] = authorizationCtx.principals[0].roles;
+    if (roles.length === 0) {
+      console.log('AALOW');
+      return AuthorizationDecision.ALLOW;
+    }
     let allow = false;
     roles.forEach((x) => {
       if (userRoles.indexOf(x) > -1) {
