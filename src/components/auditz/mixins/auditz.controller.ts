@@ -33,7 +33,7 @@ export interface AuditzControllerOptions {
 export function AuditzControllerMixin<
   M extends Entity & AuditzModel<ID>,
   ID,
-  T extends MixinTarget<object>
+  T extends MixinTarget<object>,
 >(superClass: T, options: AuditzControllerOptions) {
   const voterSubject = voterInjectRessourceId(0);
   class MixedController extends superClass {
