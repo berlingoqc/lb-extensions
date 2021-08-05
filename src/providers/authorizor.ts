@@ -21,10 +21,12 @@ export class RoleAuthorizationProvider implements Provider<Authorizer> {
     authorizationCtx: AuthorizationContext,
     metadata: AuthorizationMetadata,
   ) {
-    const roles: string[] = metadata.allowedRoles ?? [];
+    if (!metadata.allowedRoles) {
+      return AuthorizationDecision.ABSTAIN;
+    }
+    const roles: string[] = metadata.allowedRoles;
     const userRoles: string[] = authorizationCtx.principals[0].roles;
     if (roles.length === 0) {
-      console.log('AALOW');
       return AuthorizationDecision.ALLOW;
     }
     let allow = false;
