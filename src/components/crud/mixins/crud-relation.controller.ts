@@ -28,7 +28,7 @@ export const addCrudRelationController = <
   E extends Entity,
   ID,
   ER extends Entity,
-  IDR
+  IDR,
 >(
   app: RestApplication,
   modelDef: ModelDef,
@@ -108,7 +108,7 @@ export function CrudRelationControllerMixin<
   ES extends Entity,
   IDS,
   ER extends Entity,
-  IDR
+  IDR,
 >(
   superClass: T,
   repoEntity: Function & {prototype: any} & typeof Model,
@@ -221,6 +221,22 @@ export function CrudRelationControllerMixin<
       @param.query.object('filter') filter?: Filter<ER>,
     ) {
       return findData(id, filter);
+    }
+
+    @operatorDecorator({
+      op: 'GET',
+      path: `${basePath}/count`,
+      name: repoEntity.name + 'Count',
+      model: repoEntityRelation,
+      disabled: isDisabled('find'),
+      spec: optionsRelation.specs ? optionsRelation.specs['find'] : undefined,
+    })
+    @chain(...getDecoratorsProperties(options.properties, 'find'))
+    async countRelationModel(
+      @parampath() id: IDS,
+      @param.query.object('filter') filter?: Filter<ER>,
+    ) {
+      return repository.count(filter);
     }
 
     @operatorDecorator({
