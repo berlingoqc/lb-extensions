@@ -47,7 +47,8 @@ export const CredentialsRequestBody = {
 };
 
 export class ProfileCredentialService
-  implements UserService<User, Credentials> {
+  implements UserService<User, Credentials>
+{
   static invalidCredentialsError = 'Invalid email or password.';
 
   constructor(

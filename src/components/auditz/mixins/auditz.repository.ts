@@ -81,7 +81,7 @@ export function AuditzRepositoryMixin<
   ID,
   R extends MixinTarget<EntityCrudRepository<T, ID, {}>> = Constructor<
     DefaultCrudRepository<T, ID, {}>
-  >
+  >,
 >(superClass: R, settings: AuditzRepositorySettings = {}) {
   const softDelete =
     settings.softDeleted == null ||

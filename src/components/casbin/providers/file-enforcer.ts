@@ -8,7 +8,8 @@ import {EnforcerByRoleOrFilter} from '../models';
  * Il faut fournir avec POLICIES_PATH { role1: "./fichier.csv"}
  */
 export class EnforcerFactoryProvider
-  implements Provider<EnforcerByRoleOrFilter> {
+  implements Provider<EnforcerByRoleOrFilter>
+{
   constructor(
     @inject(CasbinBindings.MODEL_PATH)
     private casbinModelPath: string,

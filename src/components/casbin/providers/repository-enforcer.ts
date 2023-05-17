@@ -10,7 +10,8 @@ import {CasbinPolicyRepository} from '../repositories';
  * Provider d'enforcer qui utilise un repository pour stocker les policies
  */
 export class RepositoryEnforcerProvider
-  implements Provider<EnforcerByRoleOrFilter> {
+  implements Provider<EnforcerByRoleOrFilter>
+{
   constructor(
     @inject(CasbinBindings.MODEL_PATH)
     private casbinModelPath: string,

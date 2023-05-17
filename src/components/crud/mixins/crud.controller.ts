@@ -88,7 +88,7 @@ export const addCRUDController = <E extends Entity, ID>(
 export function CrudControllerMixin<
   T extends MixinTarget<object>,
   E extends Entity,
-  ID
+  ID,
 >(
   superClass: T,
   repoEntity: Function & {prototype: any} & typeof Model,

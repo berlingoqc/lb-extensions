@@ -72,7 +72,7 @@ export class FileStorageService implements StorageProvider {
 
   // Create folder with container name
   async createContainers<
-    T extends StorageProviderConfig = StorageProviderConfig
+    T extends StorageProviderConfig = StorageProviderConfig,
   >(config: T): Promise<object> {
     // valid not present
     const containerPath = this.getContainerPath(config.name);
